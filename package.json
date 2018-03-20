@@ -4,7 +4,8 @@
   "description": "Stage 1 of the MWS Restaurant Review website",
   "main": "index.html",
   "scripts": {
-    "run": "live-server --port=8000 --entry-file=index.html --wait=300 && node-sass -w /scss -o /css"
+    "start":
+      "live-server --port=8000 --entry-file=index.html --wait=300 && node-sass -w /scss -o /css"
   },
   "repository": {
     "type": "git",
