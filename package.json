@@ -5,7 +5,9 @@
   "main": "index.html",
   "scripts": {
     "start":
-      "live-server --port=8000 --entry-file=index.html --wait=300 && node-sass -w /scss -o /css"
+      "live-server --port=8000 --entry-file=index.html --wait=300 && npm run build:sass && npm run watch:sass",
+    "build:sass": "node-sass -r scss/ -o css/",
+    "watch:sass": "node-sass -w scss/ -o css/"
   },
   "repository": {
     "type": "git",
