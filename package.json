@@ -4,10 +4,10 @@
   "description": "Stage 1 of the MWS Restaurant Review website",
   "main": "index.html",
   "scripts": {
-    "start":
-      "live-server --port=8000 --entry-file=index.html --wait=300 && npm run build:sass && npm run watch:sass",
+    "start": "npm-run-all -p build:sass watch:sass serve",
     "build:sass": "node-sass -r scss/ -o css/",
-    "watch:sass": "node-sass -w scss/ -o css/"
+    "watch:sass": "node-sass -w scss/ -o css/",
+    "serve": "live-server --port=8000 --entry-file=index.html --wait=300"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
     "grunt-mkdir": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-responsive-images": "^1.10.1",
-    "node-sass": "^4.7.2"
+    "node-sass": "^4.7.2",
+    "npm-run-all": "^4.1.2"
   }
 }
