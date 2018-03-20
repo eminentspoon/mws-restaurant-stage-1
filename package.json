@@ -1,0 +1,31 @@
+{
+  "name": "mws-restaurant-stage1",
+  "version": "1.0.0",
+  "description": "Stage 1 of the MWS Restaurant Review website",
+  "main": "index.html",
+  "scripts": {
+    "run": "live-server --port=8000 --entry-file=index.html --wait=300 && node-sass -w /scss -o /css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eminentspoon/mws-restaurant-stage-1.git"
+  },
+  "author": "eminentspoon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eminentspoon/mws-restaurant-stage-1/issues"
+  },
+  "homepage": "https://github.com/eminentspoon/mws-restaurant-stage-1#readme",
+  "devDependencies": {
+    "live-server": "^1.2.0",
+    "grunt": "^1.0.2",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-nodeunit": "^1.0.0",
+    "grunt-contrib-uglify": "^3.3.0",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-mkdir": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-responsive-images": "^1.10.1",
+    "node-sass": "^4.7.2"
+  }
+}
