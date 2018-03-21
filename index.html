@@ -23,7 +23,7 @@
     <section id="map-container">
       <div id="map"></div>
     </section>
-    <section>
+    <section id="filter-container">
       <div class="filter-options">
         <h2>Filter Results</h2>
         <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
@@ -33,6 +33,9 @@
           <option value="all">All Cuisines</option>
         </select>
       </div>
+    </section>
+    <section id="result-container">
+      <h2>Results</h2>
       <ul id="restaurants-list"></ul>
     </section>
   </main>
