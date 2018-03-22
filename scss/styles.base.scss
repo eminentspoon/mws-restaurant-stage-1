@@ -282,9 +282,10 @@ body {
       }
     }
     #result-container {
+      width: 90%;
+      margin: 0 auto;
       h2 {
-        width: 90%;
-        margin: 10px auto;
+        margin: 10px 0;
         color: $orange-color;
         font-size: $subheader-size;
         font-weight: $light-font-weight;
@@ -297,8 +298,6 @@ body {
         display: flex;
         flex-wrap: wrap;
         padding: 0;
-        width: 90%;
-        margin: 0 auto;
 
         li {
           background-color: #fff;
