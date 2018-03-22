@@ -54,13 +54,13 @@ body {
   background-color: $off-white;
   margin: 0;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 
-  &.inside {
+  &.restaurantpage {
     header {
-      position: fixed;
-      top: 0;
       width: 100%;
-      z-index: 1000;
       #breadcrumb {
         list-style: none;
         background-color: #eee;
@@ -69,15 +69,18 @@ body {
         width: 100%;
         height: 40px;
         padding: 0;
-        padding-left: 35px;
 
         li {
           display: inline;
           a {
             color: #0275d8;
             text-decoration: none;
-            padding: 10px;
+            padding: 10px 0;
             line-height: 40px;
+
+            &:first-child {
+              padding-left: 30px;
+            }
 
             &:hover {
               color: #01447e;
@@ -95,14 +98,12 @@ body {
     }
 
     #maincontent {
+      display: flex;
+      flex-direction: column;
       #map-container {
-        background: blue none repeat scroll 0 0;
-        height: 87%;
-        position: fixed;
-        right: 0;
-        top: 80px;
-        width: 50%;
-
+        width: 100%;
+        height: 300px;
+        order: 2;
         #map {
           background-color: #ccc;
           height: 100%;
@@ -114,81 +115,92 @@ body {
       #reviews-container {
         border-bottom: 1px solid #d9d9d9;
         border-top: 1px solid #fff;
-        padding: 140px 40px 30px;
-        width: 50%;
       }
 
       #restaurant-container {
+        order: 1;
+        width: 90%;
+        display: block;
+        margin: 0 auto;
         #restaurant-name {
-          color: #f18200;
-          font-size: 20pt;
-          font-weight: 200;
-          letter-spacing: 0;
-          margin: 15px 0 30px;
+          color: $orange-color;
+          font-size: 2.2em;
+          font-weight: $light-font-weight;
           text-transform: uppercase;
           line-height: 1.1;
-        }
-        #restaurant-img {
-          width: 90%;
+          text-align: center;
+          margin: 20px 0 10px 0;
         }
         #restaurant-address {
-          font-size: 12pt;
-          margin: 10px 0px;
+          color: $light-font-color;
+          font-size: 1.2em;
+          margin: 0;
+          padding: 0;
+          text-align: center;
+          margin-bottom: 5px;
+          font-weight: $light-font-weight;
+        }
+        #restaurant-img {
+          width: 100%;
+          margin: 0;
+          padding: 0;
         }
         #restaurant-cuisine {
           background-color: #333;
           color: #ddd;
-          font-size: 12pt;
-          font-weight: 300;
+          font-size: 1.2em;
+          font-weight: $light-font-weight;
           letter-spacing: 10px;
-          margin: 0 0 20px;
-          padding: 2px 0;
+          margin: 0;
+          padding: 1px 0;
           text-align: center;
           text-transform: uppercase;
-          width: 90%;
+        }
+
+        #restaurant-hours {
+          width: 95%;
+          margin: 10px auto 15px auto;
+          display: block;
+          td {
+            color: $light-font-color;
+            &:first-child {
+              font-weight: $heavy-font-weight;
+              padding-right: 15px;
+            }
+          }
         }
       }
 
       #reviews-container {
-        padding: 30px 40px 80px;
+        order: 3;
 
         h2 {
           color: #f58500;
-          font-size: 24pt;
-          font-weight: 300;
+          font-size: 2.4em;
+          font-weight: $light-font-weight;
           letter-spacing: -1px;
           padding-bottom: 1pt;
-        }
-        li {
-          background-color: #fff;
-          border: 2px solid #f3f3f3;
-          display: block;
-          list-style-type: none;
-          margin: 0 0 30px;
-          overflow: hidden;
-          padding: 0 20px 20px;
-          position: relative;
-          width: 85%;
-          p {
-            margin: 0 0 10px;
-          }
         }
 
         #reviews-list {
           margin: 0;
           padding: 0;
-        }
-
-        #restaurant-hours td {
-          color: #666;
+          li {
+            background-color: #fff;
+            border: 2px solid #f3f3f3;
+            display: block;
+            list-style-type: none;
+            margin: 0 0 30px;
+            overflow: hidden;
+            padding: 0 20px 20px;
+            position: relative;
+            width: 85%;
+            p {
+              margin: 0 0 10px;
+            }
+          }
         }
       }
-    }
-
-    #footer {
-      bottom: 0;
-      position: absolute;
-      width: 50%;
     }
   }
 
@@ -206,7 +218,7 @@ body {
         a {
           color: #fff;
           font-size: 1.4rem;
-          font-weight: 200;
+          font-weight: $light-font-weight;
           letter-spacing: 8px;
           text-transform: uppercase;
           padding: 10px;
@@ -228,6 +240,10 @@ body {
         height: 300px;
         width: 100%;
         background-color: #ccc;
+
+        img:focus {
+          border: 2px solid black !important;
+        }
       }
     }
     #filter-container {
