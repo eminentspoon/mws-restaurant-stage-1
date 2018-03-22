@@ -173,10 +173,13 @@ body {
 
       #reviews-container {
         order: 3;
+        width: 90%;
+        margin: 0 auto;
 
         h2 {
-          color: #f58500;
-          font-size: 2.4em;
+          color: $orange-color;
+          font-size: $subheader-size;
+          font-weight: $light-font-weight;
           font-weight: $light-font-weight;
           letter-spacing: -1px;
           padding-bottom: 1pt;
@@ -282,6 +285,9 @@ body {
       h2 {
         width: 90%;
         margin: 10px auto;
+        color: $orange-color;
+        font-size: $subheader-size;
+        font-weight: $light-font-weight;
       }
       #restaurants-list {
         background-color: #f3f3f3;
