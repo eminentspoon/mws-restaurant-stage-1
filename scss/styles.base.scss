@@ -145,6 +145,7 @@ body {
           width: 100%;
           margin: 0;
           padding: 0;
+          display: block;
         }
         #restaurant-cuisine {
           background-color: #333;
@@ -153,7 +154,8 @@ body {
           font-weight: $light-font-weight;
           letter-spacing: 10px;
           margin: 0;
-          padding: 1px 0;
+          margin-top: 3px;
+          padding: 4px 0;
           text-align: center;
           text-transform: uppercase;
         }
@@ -191,16 +193,39 @@ body {
           padding: 0;
           li {
             background-color: #fff;
-            border: 2px solid #f3f3f3;
+            box-shadow: 0px 0px 2px $orange-color;
+            border-radius: 4px;
             display: block;
             list-style-type: none;
-            margin: 0 0 30px;
+            margin: 0 auto 15px auto;
             overflow: hidden;
-            padding: 0 20px 20px;
+            padding: 10px;
             position: relative;
-            width: 85%;
             p {
-              margin: 0 0 10px;
+              margin: 0;
+              padding: 0;
+              &.name {
+                font-weight: $heavy-font-weight;
+                font-size: 1.3em;
+              }
+              &.date {
+                color: $light-font-color;
+              }
+              &.comments {
+                margin-top: 15px;
+              }
+            }
+            .rating {
+              position: absolute;
+              top: 3px;
+              right: 3px;
+              font-size: 1.6em;
+              color: $light-font-color;
+              span {
+                &.checked {
+                  color: $orange-color;
+                }
+              }
             }
           }
         }
