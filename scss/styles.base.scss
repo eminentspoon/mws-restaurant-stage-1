@@ -290,6 +290,14 @@ body {
         font-size: $subheader-size;
         font-weight: $light-font-weight;
       }
+      #noresults {
+        font-size: 1.4em;
+        display: none;
+        &.show {
+          display: initial;
+        }
+      }
+
       #restaurants-list {
         background-color: #f3f3f3;
         list-style: outside none none;
