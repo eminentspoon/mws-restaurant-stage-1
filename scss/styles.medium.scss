@@ -1,0 +1,114 @@
+@charset "utf-8";
+@import "variables";
+
+body {
+  header {
+    nav {
+      height: 50px;
+      h1 {
+        line-height: 50px;
+      }
+    }
+  }
+  #maincontent {
+    #map-container {
+      #map {
+        height: 400px;
+      }
+    }
+    #filter-container {
+      .filter-options {
+        width: 95%;
+        select {
+          width: 49%;
+          padding-left: 5px;
+          height: 35px;
+        }
+      }
+    }
+    #result-container {
+      width: 95%;
+      #noresults {
+        &.show {
+          margin-bottom: 20px;
+        }
+      }
+      #restaurants-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+        li {
+          width: 45%;
+          margin: 5px;
+          padding: 0;
+          display: flex;
+          flex-flow: column nowrap;
+          p:last-of-type {
+            margin-bottom: 20px;
+          }
+          a {
+            margin-top: auto;
+          }
+        }
+      }
+    }
+  }
+  &.restaurantpage {
+    header {
+      #breadcrumb {
+        height: 50px;
+        li {
+          font-size: 1.2em;
+          a {
+            line-height: 50px;
+          }
+        }
+      }
+    }
+    #maincontent {
+      #map-container {
+        margin-top: 15px;
+        width: 100%;
+      }
+      #restaurant-container {
+        width: 95%;
+
+        #restaurant-img {
+          width: 80%;
+          margin: 0 auto;
+        }
+        #restaurant-hours {
+          width: 80%;
+          margin: 15px auto 10px auto;
+          tr {
+            td {
+              font-size: 1.4em;
+              padding-bottom: 15px;
+              &:last-of-type {
+                text-align: center;
+                width: 100%;
+              }
+            }
+          }
+        }
+        #restaurant-cuisine {
+          width: 80%;
+          margin: 0 auto;
+        }
+      }
+      #reviews-container {
+        width: 95%;
+        #reviews-list {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+
+          li {
+            width: 45%;
+            margin: 10px 0;
+          }
+        }
+      }
+    }
+  }
+}
