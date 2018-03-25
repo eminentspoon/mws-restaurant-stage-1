@@ -14,3 +14,21 @@
     }
   }
 }
+
+@media screen and (min-width: 550px) and (max-width: 640px) {
+  body.restaurantpage {
+    #maincontent {
+      #restaurant-container {
+        #restaurant-hours {
+          tr {
+            td {
+              &:last-of-type {
+                font-size: 1.2em;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
