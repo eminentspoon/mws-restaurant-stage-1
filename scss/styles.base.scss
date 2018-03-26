@@ -57,6 +57,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-height: 100vh;
 
   &.restaurantpage {
     header {
@@ -259,6 +260,7 @@ body {
     background-color: #f3f3f3;
     min-height: 100%;
     width: 100%;
+    flex: 1;
     section {
       width: 100%;
     }
