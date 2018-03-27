@@ -41,8 +41,6 @@ body {
           width: 45%;
           margin: 5px;
           padding: 0;
-          display: flex;
-          flex-flow: column nowrap;
           p:last-of-type {
             margin-bottom: 20px;
           }
@@ -73,7 +71,7 @@ body {
       #restaurant-container {
         width: 95%;
 
-        #restaurant-img {
+        #img-container {
           width: 80%;
           margin: 0 auto;
         }
