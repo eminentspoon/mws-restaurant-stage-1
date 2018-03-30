@@ -1,5 +1,8 @@
 let restaurant;
 var map;
+const desktopMedia = "(min-width: 900px)";
+const mediumMedia = "(min-width: 550px) and (max-width: 899px)";
+const baseMedia = "(max-width: 549px)";
 
 /**
  * Initialize Google map, called from HTML.
@@ -58,10 +61,30 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const address = document.getElementById("restaurant-address");
   address.innerHTML = restaurant.address;
 
-  const image = document.getElementById("restaurant-img");
+  const sourceSets = DBHelper.responsiveImagesForRestaurant(restaurant);
+
+  const baseSource = document.createElement("source");
+  baseSource.srcset = sourceSets.medium;
+  baseSource.media = baseMedia;
+
+  const mediumSource = document.createElement("source");
+  mediumSource.srcset = sourceSets.large;
+  mediumSource.media = mediumMedia;
+
+  const largeSource = document.createElement("source");
+  largeSource.srcset = sourceSets.medium;
+  largeSource.media = desktopMedia;
+
+  const image = document.createElement("img");
+  image.srcset = sourceSets.medium;
+  image.alt = restaurant.photograph_desc;
   image.className = "restaurant-img";
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.alt = `${restaurant.name} - ${restaurant.neighborhood}`;
+
+  const picture = document.getElementById("restaurant-img");
+  picture.appendChild(baseSource);
+  picture.appendChild(mediumSource);
+  picture.appendChild(largeSource);
+  picture.appendChild(image);
 
   const cuisine = document.getElementById("restaurant-cuisine");
   cuisine.innerHTML = restaurant.cuisine_type;
