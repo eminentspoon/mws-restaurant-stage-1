@@ -169,6 +169,31 @@ class DBHelper {
     return `/img/${restaurant.photograph}`;
   }
 
+  static responsiveImagesForRestaurant(restaurant) {
+    const baseImageUrl = this.imageUrlForRestaurant(restaurant);
+    return {
+      small: this.buildSourceset(baseImageUrl, "small"),
+      medium: this.buildSourceset(baseImageUrl, "medium"),
+      large: this.buildSourceset(baseImageUrl, "large")
+    };
+  }
+
+  static buildSourceset(imgName, size) {
+    return `${this.injectImageStem(
+      imgName,
+      `-${size}`
+    )}, ${this.injectImageStem(imgName, `-${size}-2x`)} 2x`;
+  }
+
+  static injectImageStem(baseImg, inject) {
+    const filenamePeriodPos = baseImg.lastIndexOf(".");
+
+    return (
+      baseImg.substring(0, filenamePeriodPos) +
+      inject +
+      baseImg.substring(filenamePeriodPos, baseImg.length)
+    );
+  }
   /**
    * Map marker for a restaurant.
    */
