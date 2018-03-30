@@ -164,7 +164,6 @@ createRestaurantHTML = restaurant => {
   const mediumSource = document.createElement("source");
   mediumSource.srcset = sourceSets.small;
   mediumSource.media = mediumMedia;
-  console.log(mediumSource);
   picture.append(mediumSource);
 
   const largeSource = document.createElement("source");
