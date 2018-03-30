@@ -11,6 +11,13 @@ const baseMedia = "(max-width: 549px)";
 document.addEventListener("DOMContentLoaded", event => {
   fetchNeighborhoods();
   fetchCuisines();
+
+  document.getElementById("skipmap").addEventListener("click", e => {
+    document
+      .getElementById("filter-container")
+      .querySelectorAll("select")[0]
+      .focus();
+  });
 });
 
 /**
