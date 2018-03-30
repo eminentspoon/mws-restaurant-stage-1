@@ -1,6 +1,9 @@
 let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
+const desktopMedia = "(min-width: 900px)";
+const mediumMedia = "(min-width: 550px) and (max-width: 899px)";
+const baseMedia = "(max-width: 549px)";
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
@@ -150,12 +153,32 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  */
 createRestaurantHTML = restaurant => {
   const li = document.createElement("li");
+  const picture = document.createElement("picture");
+  const sourceSets = DBHelper.responsiveImagesForRestaurant(restaurant);
+
+  const baseSource = document.createElement("source");
+  baseSource.srcset = sourceSets.medium;
+  baseSource.media = baseMedia;
+  picture.appendChild(baseSource);
+
+  const mediumSource = document.createElement("source");
+  mediumSource.srcset = sourceSets.small;
+  mediumSource.media = mediumMedia;
+  console.log(mediumSource);
+  picture.append(mediumSource);
+
+  const largeSource = document.createElement("source");
+  largeSource.srcset = sourceSets.small;
+  largeSource.media = desktopMedia;
+  picture.append(largeSource);
 
   const image = document.createElement("img");
+  image.srcset = sourceSets.large;
+  image.alt = restaurant.photograph_desc;
   image.className = "restaurant-img";
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.alt = `${restaurant.name} - ${restaurant.neighborhood}`;
-  li.append(image);
+  picture.append(image);
+
+  li.append(picture);
 
   const name = document.createElement("h1");
   name.innerHTML = restaurant.name;
