@@ -264,6 +264,16 @@ body {
     section {
       width: 100%;
     }
+    #skipmap {
+      position: absolute;
+      top: 0;
+      left: -9999px;
+      font-size: 1.5em;
+      &:focus {
+        top: 25px;
+        left: 0px;
+      }
+    }
 
     #map-container {
       #map {
