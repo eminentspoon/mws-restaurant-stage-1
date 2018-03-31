@@ -24,6 +24,12 @@ window.initMap = () => {
   });
 };
 
+document.addEventListener("DOMContentLoaded", event => {
+  document.getElementById("skipmap").addEventListener("click", e => {
+    document.getElementById("restaurant-container").focus();
+  });
+});
+
 /**
  * Get current restaurant from page URL.
  */
@@ -87,7 +93,11 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   picture.appendChild(image);
 
   const cuisine = document.getElementById("restaurant-cuisine");
-  cuisine.innerHTML = restaurant.cuisine_type;
+  cuisine.setAttribute(
+    "aria-label",
+    `Restaurant cuisine : ${restaurant.cuisine_type}`
+  );
+  cuisine.innerText = restaurant.cuisine_type;
 
   // fill operating hours
   if (restaurant.operating_hours) {
@@ -104,6 +114,7 @@ fillRestaurantHoursHTML = (
   operatingHours = self.restaurant.operating_hours
 ) => {
   const hours = document.getElementById("restaurant-hours");
+
   for (let key in operatingHours) {
     const row = document.createElement("tr");
 
@@ -115,7 +126,7 @@ fillRestaurantHoursHTML = (
     time.innerHTML = operatingHours[key];
     row.appendChild(time);
 
-    hours.appendChild(row);
+    hours.querySelector("tbody").appendChild(row);
   }
 };
 
@@ -124,9 +135,6 @@ fillRestaurantHoursHTML = (
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById("reviews-container");
-  const title = document.createElement("h2");
-  title.innerHTML = "Reviews";
-  container.appendChild(title);
 
   if (!reviews) {
     const noReviews = document.createElement("p");
@@ -135,17 +143,24 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     return;
   }
   const ul = document.getElementById("reviews-list");
-  reviews.forEach(review => {
-    ul.appendChild(createReviewHTML(review));
-  });
+  const reviewCount = reviews.length;
+  for (let i = 0; i < reviewCount; i++) {
+    ul.appendChild(createReviewHTML(reviews[i], reviewCount, i + 1));
+  }
   container.appendChild(ul);
 };
 
 /**
  * Create review HTML and add it to the webpage.
  */
-createReviewHTML = review => {
+createReviewHTML = (review, totalCount, pos) => {
   const li = document.createElement("li");
+  li.setAttribute("aria-setsize", totalCount);
+  li.setAttribute("aria-posinset", pos);
+  li.setAttribute(
+    "aria-label",
+    `Review by ${review.name} - ${review.rating} out of 5`
+  );
   const name = document.createElement("p");
   name.classList.add("name");
   name.innerHTML = review.name;
@@ -157,7 +172,7 @@ createReviewHTML = review => {
   li.appendChild(date);
 
   const rating = document.createElement("div");
-  // TODO: make accessible
+  rating.setAttribute("aria-hidden", "true");
   rating.classList.add("rating");
   for (let i = 0; i < 5; i++) {
     if (review.rating > i) {
@@ -167,6 +182,11 @@ createReviewHTML = review => {
     rating.innerHTML += "<span>☆</span>";
   }
 
+  const ratingAccessible = document.createElement("div");
+  ratingAccessible.classList.add("plainrating");
+  ratingAccessible.innerText = `Rating: ${review.rating} out of 5`;
+
+  li.appendChild(ratingAccessible);
   li.appendChild(rating);
 
   const comments = document.createElement("p");
