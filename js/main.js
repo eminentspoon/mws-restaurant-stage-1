@@ -144,22 +144,31 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const noresults = document.getElementById("noresults");
 
   if (restaurants.length === 0) {
-    noresults.classList.add("show");
-  } else {
-    noresults.classList.remove("show");
+    const li = document.createElement("li");
+    li.setAttribute("aria-setsize", 1);
+    li.setAttribute("aria-posinset", 1);
+    li.setAttribute("aria-label", "No results");
+    li.innerText = "There are no matching restaurants";
+    li.className = "noresults";
+    ul.append(li);
+  }
+  const restaurantCount = restaurants.length;
+
+  for (let i = 0; i < restaurantCount; i++) {
+    ul.append(createRestaurantHTML(restaurants[i], restaurantCount, i + 1));
   }
 
-  restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
-  });
   addMarkersToMap();
 };
 
 /**
  * Create restaurant HTML.
  */
-createRestaurantHTML = restaurant => {
+createRestaurantHTML = (restaurant, totalCount, pos) => {
   const li = document.createElement("li");
+  li.setAttribute("aria-setsize", totalCount);
+  li.setAttribute("aria-posinset", pos);
+  li.setAttribute("aria-label", restaurant.name);
   const picture = document.createElement("picture");
   const sourceSets = DBHelper.responsiveImagesForRestaurant(restaurant);
 
@@ -200,6 +209,7 @@ createRestaurantHTML = restaurant => {
 
   const more = document.createElement("a");
   more.innerHTML = "View Details";
+  more.setAttribute("aria-label", `View Details for ${restaurant.name}`);
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more);
 
