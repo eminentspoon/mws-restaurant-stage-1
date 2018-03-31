@@ -113,6 +113,14 @@ body {
         border-top: $standard-seperator-border;
       }
 
+      .plainrating {
+        position: absolute;
+        left: -9999px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      }
+
       #restaurant-container {
         order: 1;
         width: 90%;
@@ -162,6 +170,19 @@ body {
         }
 
         #restaurant-hours {
+          thead {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+          }
+          caption {
+            font-size: 1.3em;
+            font-weight: $heavy-font-weight;
+            color: $light-grey;
+            margin-bottom: 15px;
+          }
           width: 95%;
           margin: 10px auto 15px auto;
           td {
