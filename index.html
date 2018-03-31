@@ -25,23 +25,23 @@
   <main id="maincontent">
     <button id="skipmap">Skip past map</button>
     <section id="map-container">
-      <div id="map"></div>
+      <div id="map" role="application" aria-label="Interactive map showing locations of matching restaurants"></div>
     </section>
     <section id="filter-container">
       <div class="filter-options">
         <h2>Filter Results</h2>
-        <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
+        <select id="neighborhoods-select" aria-label="Filter results by neighborhood" name="neighborhoods" onchange="updateRestaurants()"
+          arial-controls="restaurants-list  noresults">
           <option value="all">All Neighborhoods</option>
         </select>
-        <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
+        <select id="cuisines-select" aria-label="Filter results by cuisine" name="cuisines" onchange="updateRestaurants()" arial-controls="restaurants-list noresults">
           <option value="all">All Cuisines</option>
         </select>
       </div>
     </section>
     <section id="result-container">
-      <h2>Results</h2>
-      <p id="noresults">There are no matching restaurants</p>
-      <ul id="restaurants-list"></ul>
+      <h2 id="resultsheader" aria-label="Restaurants matching filters">Results</h2>
+      <ul id="restaurants-list" aria-live="polite" aria-atomic="true" aria-describedby="resultsheader"></ul>
     </section>
   </main>
 
