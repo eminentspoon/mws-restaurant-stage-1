@@ -16,7 +16,7 @@ li {
   font-size: 10pt;
 }
 a {
-  color: $orange-color;
+  color: $accent-color;
   text-decoration: none;
 }
 a:hover,
@@ -119,7 +119,7 @@ body {
         display: block;
         margin: 0 auto;
         #restaurant-name {
-          color: $orange-color;
+          color: $accent-color;
           font-size: 2.2em;
           font-weight: $light-font-weight;
           text-transform: uppercase;
@@ -180,7 +180,7 @@ body {
         margin: 0 auto;
 
         h2 {
-          color: $orange-color;
+          color: $accent-color;
           font-size: $subheader-size;
           font-weight: $light-font-weight;
           font-weight: $light-font-weight;
@@ -223,7 +223,7 @@ body {
               color: $light-grey;
               span {
                 &.checked {
-                  color: $orange-color;
+                  color: $accent-color;
                 }
               }
             }
@@ -319,7 +319,7 @@ body {
       margin: 0 auto;
       h2 {
         margin: 10px 0;
-        color: $orange-color;
+        color: $accent-color;
         font-size: $subheader-size;
         font-weight: $light-font-weight;
       }
@@ -356,7 +356,7 @@ body {
           }
         }
         h1 {
-          color: $orange-color;
+          color: $accent-color;
           font-size: 1.5em;
           font-weight: 400;
           letter-spacing: 0;
@@ -371,7 +371,7 @@ body {
         }
 
         a {
-          background-color: $orange-color;
+          background-color: $accent-color;
           color: $off-white;
           display: inline-block;
           font-size: 1.3em;
@@ -393,11 +393,17 @@ body {
 
   #footer {
     background-color: #444;
-    color: #aaa;
+    color: $off-white;
     font-size: 0.8em;
     letter-spacing: 1px;
     padding: 25px;
     text-align: center;
     text-transform: uppercase;
+    a {
+      color: $off-white;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 }
