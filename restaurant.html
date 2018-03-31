@@ -27,20 +27,36 @@
     </ul>
   </header>
   <main id="maincontent">
+    <button id="skipmap">Skip past map</button>
     <section id="map-container">
-      <div id="map"></div>
+      <div id="map" role="application" aria-label="Interactive map showing the location of this restaurant"></div>
     </section>
-    <section id="restaurant-container">
+    <section id="restaurant-container" aria-label="Details for the restaurant" tabindex="-1">
       <h1 id="restaurant-name"></h1>
       <p id="restaurant-address"></p>
       <div id="img-container">
         <picture id="restaurant-img">
       </div>
       <p id="restaurant-cuisine"></p>
-      <table id="restaurant-hours"></table>
+      <table id="restaurant-hours" aria-label="Restaurant Opening Hours" role="grid">
+        <caption>Opening hours</caption>
+        <thead>
+          <th scope="col">
+            <span role="columnheader">Day of the week</span>
+          </th>
+          <th scope="col">
+            <span role="columnheader">Hours</span>
+          </th>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
     </section>
     <section id="reviews-container">
-      <ul id="reviews-list"></ul>
+      <h2>Reviews</h2>
+      <div id="reviewsdesc" hidden aria-hidden="Reviews for restaurant">Reviews for restaurant</div>
+      <ul id="reviews-list" aria-describedby="reviewsdesc"></ul>
     </section>
   </main>
   <footer id="footer">
