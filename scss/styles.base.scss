@@ -74,7 +74,7 @@ body {
           display: inline;
           font-size: 1.1em;
           a {
-            color: $blue-color;
+            color: $accent-color;
             text-decoration: none;
             padding: 10px 0;
             line-height: 40px;
@@ -157,7 +157,7 @@ body {
           }
         }
         #restaurant-cuisine {
-          background-color: $dark-grey;
+          background-color: $accent-color;
           color: $off-white;
           font-size: 1.2em;
           font-weight: $light-font-weight;
