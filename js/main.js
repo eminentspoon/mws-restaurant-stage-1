@@ -9,6 +9,7 @@ const baseMedia = "(max-width: 549px)";
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener("DOMContentLoaded", event => {
+  SWHelper.registerServiceWorker();
   fetchNeighborhoods();
   fetchCuisines();
 

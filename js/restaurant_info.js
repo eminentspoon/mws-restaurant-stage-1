@@ -25,6 +25,7 @@ window.initMap = () => {
 };
 
 document.addEventListener("DOMContentLoaded", event => {
+  SWHelper.registerServiceWorker();
   document.getElementById("skipmap").addEventListener("click", e => {
     document.getElementById("restaurant-container").focus();
   });
