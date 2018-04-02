@@ -1,5 +1,6 @@
 const baseCacheValues = [
   "/index.html",
+  "/restaurant.html",
   "/css/styles.base.css",
   "/css/styles.large.css",
   "/css/styles.medium.css",
