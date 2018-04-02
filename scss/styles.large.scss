@@ -67,10 +67,12 @@ body {
         height: 60px;
         max-width: $max-display-width;
         margin: 0 auto;
-        li {
-          font-size: 1.3em;
-          a {
-            line-height: 60px;
+        ol {
+          li {
+            font-size: 1.3em;
+            a {
+              line-height: 60px;
+            }
           }
         }
       }

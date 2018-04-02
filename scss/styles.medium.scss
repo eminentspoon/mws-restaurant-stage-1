@@ -55,10 +55,12 @@ body {
     header {
       #breadcrumb {
         height: 50px;
-        li {
-          font-size: 1.2em;
-          a {
-            line-height: 50px;
+        ol {
+          li {
+            font-size: 1.2em;
+            a {
+              line-height: 50px;
+            }
           }
         }
       }
