@@ -52,6 +52,14 @@ The project has been set up as an npm project. In order to get the required depe
 npm install
 ```
 
+Once all the required dependencies are installed, run the following command to launch the project:
+
+```
+npm start
+```
+
+This will generate the stylesheets, images and launch the web server for the project. Further details on the commands can been found in the **Available npm scripts** section.
+
 #### Project details
 
 * Uses SASS for stylesheets
