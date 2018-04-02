@@ -8,7 +8,7 @@ const baseCacheValues = [
   "/js/main.js",
   "/js/restaurant_info.js",
   "/data/restaurants.json",
-  "/"
+  "/favicon.ico"
 ];
 
 const version = "v0.1";
@@ -42,22 +42,29 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  if (event.request.url.origin === location.origin) {
-    caches.open(internalCache).then(cache => {
-      if (event.request.url === "/") {
-        return checkCacheAndRespond(cache, "/index.html");
-      }
+  const url = new URL(event.request.url);
+  if (url.origin === location.origin) {
+    event.respondWith(
+      caches.open(internalCache).then(cache => {
+        //handle route path equiv
+        if (url.pathname === "/") {
+          return checkCacheAndRespond(cache, "/index.html");
+        }
+        //as datasource is cached, only cache page skeleton once
+        if (url.pathname.startsWith("/restaurant.html")) {
+          return checkCacheAndRespond(cache, "/restaurant.html");
+        }
 
-      return checkCacheAndRespond(cache, event.request);
-    });
+        return checkCacheAndRespond(cache, event.request);
+      })
+    );
   }
 });
 
 checkCacheAndRespond = (cache, request) => {
-  cache.match(request).then(resp => {
+  return cache.match(request).then(resp => {
     if (resp) {
-      event.respondWith(resp);
-      return;
+      return resp;
     }
 
     return fetch(request).then(networkResp => {
