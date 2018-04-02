@@ -46,6 +46,8 @@ For the **Restaurant Reviews** projects, you will incrementally convert a static
 
 ### Using the project
 
+**Important:** _The grunt taskrunner uses ImageMagick to create images for different viewports. This will need to be installed for the project to be able to be run. Please see [here](https://www.imagemagick.org/script/download.php) for installation details for your platform_.
+
 The project has been set up as an npm project. In order to get the required dependencies, run:
 
 ```
