@@ -1,28 +1,107 @@
 # Mobile Web Specialist Certification Course
+
 ---
+
 #### _Three Stage Course Material Project - Restaurant Reviews_
 
 ## Project Overview: Stage 1
 
 For the **Restaurant Reviews** projects, you will incrementally convert a static webpage to a mobile-ready web application. In **Stage One**, you will take a static design that lacks accessibility and convert the design to be responsive on different sized displays and accessible for screen reader use. You will also add a service worker to begin the process of creating a seamless offline experience for your users.
 
-### Specification
+### Aims
 
-You have been provided the code for a restaurant reviews website. The code has a lot of issues. It’s barely usable on a desktop browser, much less a mobile device. It also doesn’t include any standard accessibility features, and it doesn’t work offline at all. Your job is to update the code to resolve these issues while still maintaining the included functionality. 
+#### UI compatible with a range of display sizes
 
-### What do I do from here?
+* All content is responsive and displays on a range of display sizes - ✓
+* Content should make use of available screen real estates and should display correctly oat all screen sizes - ✓
+* An image's associated title and text renders next to the image in all viewport sizes - ✓
 
-1. In this folder, start up a simple HTTP server to serve up the site files on your local computer. Python has some simple tools to do this, and you don't even need to know Python. For most people, it's already installed on your computer. 
+#### Responsive images
 
-In a terminal, check the version of Python you have: `python -V`. If you have Python 2.x, spin up the server with `python -m SimpleHTTPServer 8000` (or some other port, if port 8000 is already in use.) For Python 3.x, you can use `python3 -m http.server 8000`. If you don't have Python installed, navigate to Python's [website](https://www.python.org/) to download and install the software.
+* Images in the size are sized appropariately to the viewport and do not crowd or overlap other elements in the browser, regardless of viewport size - ✓
 
-2. With your server running, visit the site: `http://localhost:8000`, and look around for a bit to see what the current experience looks like.
-3. Explore the provided code, and make start making a plan to implement the required features in three areas: responsive design, accessibility and offline use.
-4. Write code to implement the updates to get this site on its way to being a mobile-ready website.
+#### Application elements useable in all viewports
 
-### Note about ES6
+* On the main page: restaurants and images are displayed in all viewports - ✓
+* On the details page: a maap, hours and reviews are displayed in all viewports - ✓
 
-Most of the code in this project has been written to the ES6 JavaScript specification for compatibility with modern web browsers and future proofing JavaScript code. As much as possible, try to maintain use of ES6 in any additional JavaScript you write. 
+#### Accessible images
 
+* All content related images include appropriate alternate text that clearly describe the content of the image - ✓
 
+#### Focus
 
+* Focus is appropriately managed allowing users to noticeably tab through each of the important elements of the page - ✓
+* Modal of interstitial windows appropriately focus lock - N/A
+
+#### Semantic site elements
+
+* Elements on the page use the appropriate semantic elements - ✓
+* For elements in which a semantic element is not available, appropriate ARIA roles are defined - ✓
+
+#### Visited pages available offline
+
+* When available to the browser, a service worker caches responses to requests for site assets - ✓
+* Visited pages are rendered when there is no network access - ✓
+
+### Using the project
+
+The project has been set up as an npm project. In order to get the required dependencies, run:
+
+```
+npm install
+```
+
+#### Project details
+
+* Uses SASS for stylesheets
+  * The reason for using SASS is it allows a more structured stylesheet layout and includes benefits such as centralised variables for things like colours.
+* Uses grunt for responsive image actions
+  * The reason for using grunt is it has available plugins for generating images based upon specified sizes and qualities.
+* Uses live-server to run the server
+  * The reason for using live-server is it automatically injects code into each page to automatically apply css changes as well as automatically refreshing whenever files change.
+
+- Uses npm-run-all to run scripts
+  * The reason for using npm-run-all is it allows multiple npm scripts to be chained in a single command.
+
+#### Available npm scripts
+
+```
+npm run build::sass
+```
+
+Builds all SASS files within /scss into /css
+
+```
+npm run watch:sass
+```
+
+Sets up the SASS watch task on the /scss directory, automatically rebuilding into /css
+
+```
+npm run grunt
+```
+
+Runs the grunt task runner to generate the responsive images from /img_src to /img
+
+```
+npm run serve
+```
+
+Launches the project using live-server on port 8000, automatically opening in the default browser. **Note:** live-server launches using 127.0.0.1 rather than localhost, this should work fine with the project.
+
+```
+npm start
+```
+
+Chains the above commands into a single action. This has the result of generating images, building any existing SASS files, setting up a watch on /sass directory for any future updates and launching live-server ready for viewing / development.
+
+### Future Improvements
+
+#### General
+
+1.  Add build step to minify CSS and JS
+
+#### Service Worker
+
+1.  Update stale cache content on successful network request
