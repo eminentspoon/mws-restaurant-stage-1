@@ -1,30 +1,51 @@
 let restaurant;
+let restaurantLoaded = false,
+  mapRetryAttempts = 0,
+  maxMapRetry = 5,
+  mapTimer,
+  dataFailed = false,
+  mapInited = false;
 var map;
 const desktopMedia = "(min-width: 900px)";
 const mediumMedia = "(min-width: 550px) and (max-width: 899px)";
 const baseMedia = "(max-width: 549px)";
+const mapTimerGap = 100;
+const mapHideTimer = 2000;
 
 /**
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
-  fetchRestaurantFromURL((error, restaurant) => {
-    if (error) {
-      // Got an error!
-      console.error(error);
-    } else {
-      self.map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 16,
-        center: restaurant.latlng,
-        scrollwheel: false
-      });
-      fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+  mapInited = true;
+  if (dataFailed) {
+    return;
+  }
+
+  if (restaurantLoaded) {
+    self.map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 16,
+      center: self.restaurant.latlng,
+      scrollwheel: false
+    });
+    const map = document.getElementById("map");
+    if (map.classList.contains("failure")) {
+      //reshow is map was really slow to load in but still online
+      map.classList.remove("failure");
+      document.getElementById("map-container").removeAttribute("aria-hidden");
     }
-  });
+    DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+  } else {
+    if (mapRetryAttempts < maxMapRetry) {
+      mapRetryAttempts = mapRetryAttempts + 1;
+      mapTimer = setTimeout(window.initMap, mapTimerGap);
+      return;
+    }
+    dataFailed = true;
+  }
 };
 
 document.addEventListener("DOMContentLoaded", event => {
+  fetchRestaurantFromURL();
   SWHelper.registerServiceWorker();
   document.getElementById("skipmap").addEventListener("click", e => {
     document.getElementById("restaurant-container").focus();
@@ -34,17 +55,14 @@ document.addEventListener("DOMContentLoaded", event => {
 /**
  * Get current restaurant from page URL.
  */
-fetchRestaurantFromURL = callback => {
+fetchRestaurantFromURL = () => {
   if (self.restaurant) {
-    // restaurant already fetched!
-    callback(null, self.restaurant);
     return;
   }
   const id = getParameterByName("id");
   if (!id) {
     // no id found in URL
-    error = "No restaurant id in URL";
-    callback(error, null);
+    console.error("No restaurant id in URL");
   } else {
     DBHelper.fetchRestaurantById(id, (error, restaurant) => {
       self.restaurant = restaurant;
@@ -52,8 +70,19 @@ fetchRestaurantFromURL = callback => {
         console.error(error);
         return;
       }
+      restaurantLoaded = true;
       fillRestaurantHTML();
-      callback(null, restaurant);
+      fillBreadcrumb();
+      setTimeout(() => {
+        if (mapInited) {
+          return;
+        }
+        //add class to minimise and then hide from screen readers etc
+        document.getElementById("map").classList.add("failure");
+        document
+          .getElementById("map-container")
+          .setAttribute("aria-hidden", true);
+      }, mapHideTimer);
     });
   }
 };
