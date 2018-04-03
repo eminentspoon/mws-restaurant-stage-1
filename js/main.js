@@ -1,10 +1,19 @@
-let restaurants, neighborhoods, cuisines;
+let restaurants,
+  neighborhoods,
+  cuisines,
+  mapLoaded = false,
+  mapFailure = false,
+  markerRetryAttempts = 0,
+  maxMarkerRetry = 5,
+  markerTimer;
+
 var map;
 var markers = [];
+
 const desktopMedia = "(min-width: 900px)";
 const mediumMedia = "(min-width: 550px) and (max-width: 899px)";
 const baseMedia = "(max-width: 549px)";
-
+const markerTimerGap = 500;
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
@@ -12,6 +21,7 @@ document.addEventListener("DOMContentLoaded", event => {
   SWHelper.registerServiceWorker();
   fetchNeighborhoods();
   fetchCuisines();
+  updateRestaurants();
 
   document.getElementById("skipmap").addEventListener("click", e => {
     document
@@ -91,7 +101,7 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-  updateRestaurants();
+  mapLoaded = true;
 };
 
 /**
@@ -221,12 +231,30 @@ createRestaurantHTML = (restaurant, totalCount, pos) => {
  * Add markers for current restaurants to the map.
  */
 addMarkersToMap = (restaurants = self.restaurants) => {
-  restaurants.forEach(restaurant => {
-    // Add marker to the map
-    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
-    google.maps.event.addListener(marker, "click", () => {
-      window.location.href = marker.url;
+  if (mapFailure) {
+    return;
+  }
+  clearTimeout(markerTimer);
+  if (mapLoaded) {
+    markerRetryAttempts = 0;
+    restaurants.forEach(restaurant => {
+      // Add marker to the map
+      const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
+      google.maps.event.addListener(marker, "click", () => {
+        window.location.href = marker.url;
+      });
+      self.markers.push(marker);
     });
-    self.markers.push(marker);
-  });
+  } else {
+    if (markerRetryAttempts < maxMarkerRetry) {
+      markerRetryAttempts = markerRetryAttempts + 1;
+      markerTimer = setTimeout(addMarkersToMap, markerTimerGap);
+      return;
+    }
+    //stop multiple retries after giving up
+    mapFailure = true;
+    //add class to minimise and then hide from screen readers etc
+    document.getElementById("map").classList.add("failure");
+    document.getElementById("map-container").setAttribute("aria-hidden", true);
+  }
 };
