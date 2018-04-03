@@ -44,7 +44,13 @@ For the **Restaurant Reviews** projects, you will incrementally convert a static
 * When available to the browser, a service worker caches responses to requests for site assets - ✓
 * Visited pages are rendered when there is no network access - ✓
 
-### Using the project
+### Releases
+
+#### v0.1
+
+The latest version of the source has been prebuilt and any development files removed. If there are any problems running the project from the main source, this can be found in the releases area.
+
+### Building the project
 
 **Important:** _The grunt taskrunner uses ImageMagick to create images for different viewports. This will need to be installed for the project to be able to be run. Please see [here](https://www.imagemagick.org/script/download.php) for installation details for your platform_.
 
