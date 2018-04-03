@@ -304,6 +304,10 @@ body {
 
     #map-container {
       #map {
+        &.failure {
+          height: 0px;
+          transition: height 0.25s ease-in;
+        }
         height: 300px;
         width: 100%;
         background-color: $off-white;
