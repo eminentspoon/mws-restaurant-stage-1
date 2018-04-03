@@ -7,6 +7,7 @@ const baseCacheValues = [
   "/css/styles.sub.css",
   "/js/dbhelper.js",
   "/js/main.js",
+  "/js/swhelper.js",
   "/js/restaurant_info.js",
   "/data/restaurants.json",
   "/favicon.ico"
