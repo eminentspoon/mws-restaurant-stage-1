@@ -46,9 +46,13 @@ For the **Restaurant Reviews** projects, you will incrementally convert a static
 
 ### Releases
 
-#### [v0.1](https://github.com/eminentspoon/mws-restaurant-stage-1/releases/tag/v0.1)
+- [v0.2](https://github.com/eminentspoon/mws-restaurant-stage-1/releases/tag/v0.2)
 
 The latest version of the source has been prebuilt and any development files removed. If there are any problems running the project from the main source, this can be found in the releases area.
+
+- [v0.1](https://github.com/eminentspoon/mws-restaurant-stage-1/releases/tag/v0.1)
+
+The initial source code first submitted for stage 1.
 
 ### Building the project
 
