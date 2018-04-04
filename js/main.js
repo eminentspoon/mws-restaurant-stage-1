@@ -200,7 +200,7 @@ createRestaurantHTML = (restaurant, totalCount, pos) => {
 
   const image = document.createElement("img");
   image.srcset = sourceSets.large;
-  image.alt = restaurant.photograph_desc;
+  image.alt = DBHelper.imageAltTextForRestaurant(restaurant);
   image.className = "restaurant-img";
   picture.append(image);
 

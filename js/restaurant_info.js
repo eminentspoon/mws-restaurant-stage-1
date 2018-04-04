@@ -1,4 +1,4 @@
-let restaurant;
+﻿let restaurant;
 let restaurantLoaded = false,
   mapRetryAttempts = 0,
   maxMapRetry = 5,
@@ -113,7 +113,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const image = document.createElement("img");
   image.srcset = sourceSets.medium;
-  image.alt = restaurant.photograph_desc;
+  image.alt = DBHelper.imageAltTextForRestaurant(restaurant);
   image.className = "restaurant-img";
 
   const picture = document.getElementById("restaurant-img");
