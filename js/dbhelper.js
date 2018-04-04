@@ -162,6 +162,13 @@ class DBHelper {
     return `./restaurant.html?id=${restaurant.id}`;
   }
 
+
+  static imageAltTextForRestaurant(restaurant) {
+    return `${restaurant.name} - a ${
+      restaurant.neighborhood
+    } based restaurant serving ${restaurant.cuisine_type.toLowerCase()}-style food.`;
+  }
+
   /**
    * Restaurant image URL.
    */
