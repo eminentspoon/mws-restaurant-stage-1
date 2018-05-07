@@ -27,7 +27,7 @@ class DBHelper {
         callback(null, restaurants);
       })
       .catch(err => {
-        const error = `Unable to contact server: ${err}`;
+        const error = `Unable to get list of restaurants: ${err}`;
         callback(error, null);
       });
   }
@@ -36,21 +36,25 @@ class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-    // fetch all restaurants with proper error handling.
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        const restaurant = restaurants.find(r => r.id == id);
-        if (restaurant) {
-          // Got the restaurant
-          callback(null, restaurant);
-        } else {
-          // Restaurant does not exist in the database
-          callback("Restaurant does not exist", null);
+    fetch(`${DBHelper.DATABASE_URL}/${id}`)
+      .then(resp => {
+        if (!resp.ok) {
+          if (resp.status === 404) {
+            callback("Restaurant does not exist", null);
+            return;
+          }
+
+          throw Error(resp.statusText);
         }
-      }
-    });
+        return resp.json();
+      })
+      .then(restaurant => {
+        callback(null, restaurant);
+      })
+      .catch(err => {
+        const error = `Unable to get restaurant: ${err}`;
+        callback(error, null);
+      });
   }
 
   /**
