@@ -13,7 +13,7 @@ const baseCacheValues = [
   "/favicon.ico"
 ];
 
-const version = "v0.1";
+const version = "v0.2";
 const uniquePrefix = "restaurantreviews-";
 const internalCache = `${uniquePrefix}-static-${version}`;
 
@@ -45,7 +45,7 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
-  if (url.origin === location.origin) {
+  if (url.hostname === location.hostname) {
     event.respondWith(
       caches.open(internalCache).then(cache => {
         //handle route path equiv
