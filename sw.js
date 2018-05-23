@@ -19,7 +19,7 @@ const version = "v0.2";
 const storeVersion = 1;
 const uniquePrefix = "restaurantreviews";
 const internalCache = `${uniquePrefix}-static-${version}`;
-const dataUrl = "http://localhost:1337/restaurants";
+const dataUrl = `http://${location.hostname}:1337/restaurants`;
 const storeName = `${uniquePrefix}-store`;
 const objectStoreName = "restaurants";
 
@@ -32,7 +32,19 @@ initStore = () => {
           break;
       }
     })
-    .then(db => console.log("db created"));
+    .then(db => {
+      fetch(dataUrl)
+        .then(resp => {
+          return resp.json();
+        })
+        .then(rests => {
+          const tx = db.transaction(objectStoreName, "readwrite");
+          rests.map(rest => {
+            tx.objectStore(objectStoreName).put(rest);
+          });
+        });
+      console.log("db created and seeded");
+    });
 };
 
 cacheBaseAssets = () => {
@@ -63,6 +75,23 @@ cleanOldCaches = () => {
   });
 };
 
+checkCacheAndRespond = (cache, request) => {
+  return cache.match(request).then(resp => {
+    if (resp) {
+      return resp;
+    }
+
+    return fetch(request).then(networkResp => {
+      cache.put(request, networkResp.clone());
+      return networkResp;
+    });
+  });
+};
+
+getStore = () => {
+  return idb.open(storeName, storeVersion);
+};
+
 self.addEventListener("install", event => {
   event.waitUntil(cacheBaseAssets());
 });
@@ -73,7 +102,29 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  const url = new URL(event.request.url);
+  const urlString = event.request.url;
+  const url = new URL(urlString);
+  if (urlString.startsWith(dataUrl)) {
+    event.respondWith(
+      fetch(event.request).then(resp => {
+        const originalResp = resp.clone();
+        resp.json().then(rests => {
+          getStore().then(db => {
+            const tx = db.transaction(objectStoreName, "readwrite");
+            if (Array.isArray(rests)) {
+              rests.map(rest => {
+                tx.objectStore(objectStoreName).put(rest);
+              });
+            } else {
+              tx.objectStore(objectStoreName).put(rests);
+            }
+          });
+        });
+        return originalResp;
+      })
+    );
+  }
+
   if (url.origin === location.origin) {
     event.respondWith(
       caches.open(internalCache).then(cache => {
@@ -91,16 +142,3 @@ self.addEventListener("fetch", event => {
     );
   }
 });
-
-checkCacheAndRespond = (cache, request) => {
-  return cache.match(request).then(resp => {
-    if (resp) {
-      return resp;
-    }
-
-    return fetch(request).then(networkResp => {
-      cache.put(request, networkResp.clone());
-      return networkResp;
-    });
-  });
-};
