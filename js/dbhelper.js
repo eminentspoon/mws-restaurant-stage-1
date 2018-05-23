@@ -6,7 +6,7 @@ class DBHelper {
    * Database URL.
    * Change this to restaurants.json file location on your server.
    */
-  static get DATABASE_URL() {
+  static get API_ADDRESS() {
     const port = 1337; // Change this to your server port
     const hostname = window.location.hostname;
     return `http://${hostname}:${port}/restaurants`;
@@ -16,7 +16,7 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    fetch(DBHelper.DATABASE_URL)
+    fetch(DBHelper.API_ADDRESS)
       .then(resp => {
         if (!resp.ok) {
           throw Error(resp.statusText);
@@ -36,7 +36,7 @@ class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-    fetch(`${DBHelper.DATABASE_URL}/${id}`)
+    fetch(`${DBHelper.API_ADDRESS}/${id}`)
       .then(resp => {
         if (!resp.ok) {
           if (resp.status === 404) {
