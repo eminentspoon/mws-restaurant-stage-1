@@ -1,3 +1,5 @@
+importScripts("node_modules/idb/lib/idb.js");
+
 const baseCacheValues = [
   "/index.html",
   "/restaurant.html",
@@ -14,33 +16,60 @@ const baseCacheValues = [
 ];
 
 const version = "v0.2";
-const uniquePrefix = "restaurantreviews-";
+const storeVersion = 1;
+const uniquePrefix = "restaurantreviews";
 const internalCache = `${uniquePrefix}-static-${version}`;
+const dataUrl = "http://localhost:1337/restaurants";
+const storeName = `${uniquePrefix}-store`;
+const objectStoreName = "restaurants";
+
+initStore = () => {
+  idb
+    .open(storeName, storeVersion, upgradeDb => {
+      switch (upgradeDb.oldVersion) {
+        case 0:
+          upgradeDb.createObjectStore(objectStoreName, { keyPath: "id" });
+          break;
+      }
+    })
+    .then(db => console.log("db created"));
+};
+
+cacheBaseAssets = () => {
+  return caches.open(internalCache).then(cache => {
+    return cache.addAll(baseCacheValues);
+  });
+};
+
+storeRestaurantData = () => {
+  idb.open(storeName, storeVersion).then(db => {
+    var store = db.objectStoreNames[objectStoreName];
+  });
+};
+
+cleanOldCaches = () => {
+  caches.keys().then(cacheNames => {
+    return Promise.all(
+      cacheNames
+        .filter(cacheName => {
+          return (
+            cacheName.startsWith(uniquePrefix) && cacheName !== internalCache
+          );
+        })
+        .map(cacheName => {
+          return caches["delete"](cacheName);
+        })
+    );
+  });
+};
 
 self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(internalCache).then(cache => {
-      return cache.addAll(baseCacheValues);
-    })
-  );
+  event.waitUntil(cacheBaseAssets());
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames
-          .filter(cacheName => {
-            return (
-              cacheName.startsWith(uniquePrefix) && cacheName !== internalCache
-            );
-          })
-          .map(cacheName => {
-            return caches["delete"](cacheName);
-          })
-      );
-    })
-  );
+  event.waitUntil(cleanOldCaches());
+  event.waitUntil(initStore());
 });
 
 self.addEventListener("fetch", event => {
