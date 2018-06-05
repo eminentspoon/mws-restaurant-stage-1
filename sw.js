@@ -92,6 +92,12 @@ getStore = () => {
   return idb.open(storeName, storeVersion);
 };
 
+generateResponseFromJson = json => {
+  return new Response(JSON.stringify(json), {
+    headers: { "Content-Type": "application/json" }
+  });
+};
+
 self.addEventListener("install", event => {
   event.waitUntil(cacheBaseAssets());
 });
@@ -106,22 +112,54 @@ self.addEventListener("fetch", event => {
   const url = new URL(urlString);
   if (urlString.startsWith(dataUrl)) {
     event.respondWith(
-      fetch(event.request).then(resp => {
-        const originalResp = resp.clone();
-        resp.json().then(rests => {
-          getStore().then(db => {
-            const tx = db.transaction(objectStoreName, "readwrite");
-            if (Array.isArray(rests)) {
-              rests.map(rest => {
-                tx.objectStore(objectStoreName).put(rest);
-              });
+      fetch(event.request)
+        .then(resp => {
+          const originalResp = resp.clone();
+          resp.json().then(rests => {
+            getStore().then(db => {
+              const tx = db.transaction(objectStoreName, "readwrite");
+              if (Array.isArray(rests)) {
+                rests.map(rest => {
+                  tx.objectStore(objectStoreName).put(rest);
+                });
+              } else {
+                tx.objectStore(objectStoreName).put(rests);
+              }
+            });
+          });
+          return originalResp;
+        })
+        .catch(() => {
+          const isSingleRestaurant = Number.isInteger(
+            Number(urlString.substring(urlString.length - 1))
+          );
+
+          return getStore().then(db => {
+            const tx = db.transaction(objectStoreName, "readonly");
+            if (isSingleRestaurant) {
+              const restId = Number(
+                urlString.substring(
+                  urlString.lastIndexOf("/") + 1,
+                  urlString.length
+                )
+              );
+
+              return tx
+                .objectStore(objectStoreName)
+                .get(restId)
+                .then(rest => {
+                  return generateResponseFromJson(rest);
+                });
             } else {
-              tx.objectStore(objectStoreName).put(rests);
+              return tx
+                .objectStore(objectStoreName)
+                .getAll()
+                .then(restaurants => {
+                  return generateResponseFromJson(restaurants);
+                });
             }
           });
-        });
-        return originalResp;
-      })
+        })
     );
   }
 
