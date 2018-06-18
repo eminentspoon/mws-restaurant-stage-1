@@ -1,4 +1,4 @@
-importScripts("node_modules/idb/lib/idb.js");
+importScripts("js/idb.js");
 
 const baseCacheValues = [
   "/index.html",
