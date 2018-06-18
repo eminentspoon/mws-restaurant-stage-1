@@ -45,21 +45,21 @@ module.exports = function(grunt) {
           {
             expand: true,
             src: ["*.{gif,jpg,png,webp}"],
-            cwd: "img_src/",
-            dest: "img/"
+            cwd: "src/img/",
+            dest: "dist/img/"
           }
         ]
       }
     },
     clean: {
       dev: {
-        src: ["img", "img/static"]
+        src: ["dist/img", "dist/img/static", "dist/js"]
       }
     },
     mkdir: {
       dev: {
         options: {
-          create: ["img", "img/static"]
+          create: ["dist/img", "dist/img/static", "dist/js"]
         }
       }
     },
@@ -69,22 +69,49 @@ module.exports = function(grunt) {
           {
             expand: true,
             src: ["*.{gif,jpg,png,webp}"],
-            cwd: "img_src/static",
-            dest: "img/static"
+            cwd: "src/img/static",
+            dest: "dist/img/static"
+          },
+          {
+            expand: true,
+            src: ["*.{html,json}"],
+            cwd: "src/",
+            dest: "dist/"
+          },
+          {
+            expand: true,
+            flatten: true,
+            src: ["idb.js"],
+            cwd: "node_modules/idb/lib/",
+            dest: "dist/js/"
           }
         ]
+      }
+    },
+    uglify: {
+      dev: {
+        options: {},
+        files: {
+          "dist/sw.js": ["src/sw.js"],
+          "dist/js/dbhelper.js": ["src/js/dbhelper.js"],
+          "dist/js/main.js": ["src/js/main.js"],
+          "dist/js/restaurant_info.js": ["src/js/restaurant_info.js"],
+          "dist/js/swhelper.js": ["src/js/swhelper.js"]
+        }
       }
     }
   });
 
   grunt.loadNpmTasks("grunt-responsive-images");
   grunt.loadNpmTasks("grunt-contrib-clean");
+  grunt.loadNpmTasks("grunt-contrib-uglify-es");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-mkdir");
   grunt.registerTask("default", [
     "clean",
     "mkdir",
     "responsive_images",
-    "copy"
+    "copy",
+    "uglify"
   ]);
 };
