@@ -2,10 +2,6 @@
  * Common database helper functions.
  */
 class DBHelper {
-  /**
-   * Database URL.
-   * Change this to restaurants.json file location on your server.
-   */
   static get API_ADDRESS() {
     const port = 1337; // Change this to your server port
     const hostname = window.location.hostname;

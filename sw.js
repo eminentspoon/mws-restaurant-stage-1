@@ -11,7 +11,6 @@ const baseCacheValues = [
   "/js/main.js",
   "/js/swhelper.js",
   "/js/restaurant_info.js",
-  "/data/restaurants.json",
   "/favicon.ico"
 ];
 
