@@ -53,14 +53,26 @@ module.exports = function(grunt) {
     },
     clean: {
       dev: {
-        src: ["img"]
+        src: ["img", "img/static"]
       }
     },
     mkdir: {
       dev: {
         options: {
-          create: ["img"]
+          create: ["img", "img/static"]
         }
+      }
+    },
+    copy: {
+      dev: {
+        files: [
+          {
+            expand: true,
+            src: ["*.{gif,jpg,png,webp}"],
+            cwd: "img_src/static",
+            dest: "img/static"
+          }
+        ]
       }
     }
   });
@@ -69,5 +81,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-mkdir");
-  grunt.registerTask("default", ["clean", "mkdir", "responsive_images"]);
+  grunt.registerTask("default", [
+    "clean",
+    "mkdir",
+    "responsive_images",
+    "copy"
+  ]);
 };
