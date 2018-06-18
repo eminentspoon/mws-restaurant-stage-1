@@ -175,16 +175,28 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    // TODO: add default image if none at restaurant
-    return `/img/${restaurant.photograph}.jpg`;
+    if (restaurant.photograph) {
+      return `/img/${restaurant.photograph}.webp`;
+    }
+
+    return "/img/static/default-image.webp";
   }
 
   static responsiveImagesForRestaurant(restaurant) {
     const baseImageUrl = this.imageUrlForRestaurant(restaurant);
     return {
-      small: this.buildSourceset(baseImageUrl, "small"),
-      medium: this.buildSourceset(baseImageUrl, "medium"),
-      large: this.buildSourceset(baseImageUrl, "large")
+      small:
+        baseImageUrl.indexOf("/static/") > -1
+          ? baseImageUrl
+          : this.buildSourceset(baseImageUrl, "small"),
+      medium:
+        baseImageUrl.indexOf("/static/") > -1
+          ? baseImageUrl
+          : this.buildSourceset(baseImageUrl, "medium"),
+      large:
+        baseImageUrl.indexOf("/static/") > -1
+          ? baseImageUrl
+          : this.buildSourceset(baseImageUrl, "large")
     };
   }
 
