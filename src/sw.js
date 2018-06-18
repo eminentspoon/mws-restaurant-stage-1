@@ -11,7 +11,16 @@ const baseCacheValues = [
   "/js/main.js",
   "/js/swhelper.js",
   "/js/restaurant_info.js",
-  "/favicon.ico"
+  "/favicon.ico",
+  "/img/static/default-image.webp",
+  "/img/static/placeholder.webp",
+  "/img/static/icon-96x96.webp",
+  "/img/static/icon-128x128.webp",
+  "/img/static/icon-144x144.webp",
+  "/img/static/icon-152x152.webp",
+  "/img/static/icon-192x192.webp",
+  "/img/static/icon-384x384.webp",
+  "/img/static/icon-512x512.webp"
 ];
 
 const version = "v0.2";
