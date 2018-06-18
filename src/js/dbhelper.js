@@ -179,7 +179,7 @@ class DBHelper {
   }
 
   static defaultPlaceholderImage() {
-    return "/img_src/static/placeholder.webp";
+    return "/img/static/placeholder.webp";
   }
 
   static responsiveImagesForRestaurant(restaurant) {
