@@ -182,6 +182,10 @@ class DBHelper {
     return "/img/static/default-image.webp";
   }
 
+  static defaultPlaceholderImage() {
+    return "/img_src/static/placeholder.webp";
+  }
+
   static responsiveImagesForRestaurant(restaurant) {
     const baseImageUrl = this.imageUrlForRestaurant(restaurant);
     return {
