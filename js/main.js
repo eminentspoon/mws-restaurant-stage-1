@@ -46,6 +46,31 @@ fetchNeighborhoods = () => {
   });
 };
 
+bindLazyLoad = () => {
+  const lazyImages = [].slice.call(
+    document.querySelectorAll("picture.lazy-load source, picture.lazy-load img")
+  );
+
+  if ("IntersectionObserver" in window) {
+    let lazyImageObserver = new IntersectionObserver(function(
+      entries,
+      observer
+    ) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          let lazyImage = entry.target;
+          lazyImage.srcset = lazyImage.dataset.srcset;
+          lazyImageObserver.unobserve(lazyImage);
+        }
+      });
+    });
+
+    lazyImages.forEach(function(lazyImage) {
+      lazyImageObserver.observe(lazyImage);
+    });
+  }
+};
+
 /**
  * Set neighborhoods HTML.
  */
@@ -132,6 +157,7 @@ updateRestaurants = () => {
       } else {
         resetRestaurants(restaurants);
         fillRestaurantsHTML();
+        bindLazyLoad();
       }
     }
   );
@@ -185,31 +211,8 @@ createRestaurantHTML = (restaurant, totalCount, pos) => {
   li.setAttribute("aria-setsize", totalCount);
   li.setAttribute("aria-posinset", pos);
   li.setAttribute("aria-label", restaurant.name);
-  const picture = document.createElement("picture");
-  const sourceSets = DBHelper.responsiveImagesForRestaurant(restaurant);
 
-  const baseSource = document.createElement("source");
-  baseSource.srcset = sourceSets.medium;
-  baseSource.media = baseMedia;
-  picture.appendChild(baseSource);
-
-  const mediumSource = document.createElement("source");
-  mediumSource.srcset = sourceSets.small;
-  mediumSource.media = mediumMedia;
-  picture.append(mediumSource);
-
-  const largeSource = document.createElement("source");
-  largeSource.srcset = sourceSets.small;
-  largeSource.media = desktopMedia;
-  picture.append(largeSource);
-
-  const image = document.createElement("img");
-  image.srcset = sourceSets.large;
-  image.alt = DBHelper.imageAltTextForRestaurant(restaurant);
-  image.className = "restaurant-img";
-  picture.append(image);
-
-  li.append(picture);
+  li.append(createRestaurantImageHTML(restaurant));
 
   const name = document.createElement("h2");
   name.innerHTML = restaurant.name;
@@ -230,6 +233,40 @@ createRestaurantHTML = (restaurant, totalCount, pos) => {
   li.append(more);
 
   return li;
+};
+
+createRestaurantImageHTML = restaurant => {
+  const placeholderImage = DBHelper.defaultPlaceholderImage();
+  const picture = document.createElement("picture");
+  picture.classList.add("lazy-load");
+  const sourceSets = DBHelper.responsiveImagesForRestaurant(restaurant);
+
+  const baseSource = document.createElement("source");
+  baseSource.srcset = placeholderImage;
+  baseSource.setAttribute("data-srcset", sourceSets.medium);
+  baseSource.media = baseMedia;
+  picture.appendChild(baseSource);
+
+  const mediumSource = document.createElement("source");
+  mediumMedia.srcset = placeholderImage;
+  mediumSource.setAttribute("data-srcset", sourceSets.small);
+  mediumSource.media = mediumMedia;
+  picture.append(mediumSource);
+
+  const largeSource = document.createElement("source");
+  largeSource.srcset = placeholderImage;
+  largeSource.setAttribute("data-srcset", sourceSets.small);
+  largeSource.media = desktopMedia;
+  picture.append(largeSource);
+
+  const image = document.createElement("img");
+  image.srcset = placeholderImage;
+  image.setAttribute("data-srcset", sourceSets.large);
+  image.alt = DBHelper.imageAltTextForRestaurant(restaurant);
+  image.className = "restaurant-img";
+  picture.append(image);
+
+  return picture;
 };
 
 /**
