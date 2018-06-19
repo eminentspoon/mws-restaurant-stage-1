@@ -50,7 +50,6 @@ initStore = () => {
             tx.objectStore(objectStoreName).put(rest);
           });
         });
-      console.log("db created and seeded");
     });
 };
 
