@@ -1,16 +1,15 @@
-importScripts("js/idb.js");
+importScripts("js/idb.min.js");
 
 const baseCacheValues = [
   "/index.html",
   "/restaurant.html",
-  "/css/styles.base.css",
-  "/css/styles.large.css",
-  "/css/styles.medium.css",
-  "/css/styles.sub.css",
-  "/js/dbhelper.js",
-  "/js/main.js",
-  "/js/swhelper.js",
-  "/js/restaurant_info.js",
+  "/css/styles.core.min.css",
+  "/css/styles.large.min.css",
+  "/css/styles.medium.min.css",
+  "/js/dbhelper.min.js",
+  "/js/main.min.js",
+  "/js/swhelper.min.js",
+  "/js/restaurant_info.min.js",
   "/favicon.ico",
   "/img/static/default-image.webp",
   "/img/static/placeholder.webp",
