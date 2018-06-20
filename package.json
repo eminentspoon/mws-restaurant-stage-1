@@ -4,11 +4,11 @@
   "description": "Stage 1 of the MWS Restaurant Review website",
   "main": "index.html",
   "scripts": {
-    "start": "npm-run-all -p grunt build:sass watch:sass serve",
+    "build": "npm-run-all build:sass grunt",
     "grunt": "grunt",
-    "build:sass": "node-sass -r scss/ -o css/",
-    "watch:sass": "node-sass -w scss/ -o css/",
-    "serve": "live-server --port=8000 --entry-file=index.html --wait=300"
+    "build:sass": "node-sass -r src/scss/ -o dist/css/",
+    "watch:sass": "node-sass -w src/scss/ -o dist/css/",
+    "serve": "live-server --port=8000 --mount=/:dist/ --wait=300"
   },
   "repository": {
     "type": "git",
@@ -20,16 +20,21 @@
     "url": "https://github.com/eminentspoon/mws-restaurant-stage-1/issues"
   },
   "homepage": "https://github.com/eminentspoon/mws-restaurant-stage-1#readme",
+  "dependencies": {
+    "idb": "^2.1.2"
+  },
   "devDependencies": {
-    "live-server": "^1.2.0",
     "grunt": "^1.0.2",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^2.2.1",
     "grunt-contrib-jshint": "^1.1.0",
     "grunt-contrib-nodeunit": "^1.0.0",
     "grunt-contrib-uglify": "^3.3.0",
-    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-uglify-es": "^3.3.0",
     "grunt-mkdir": "^1.0.0",
-    "grunt-contrib-copy": "^1.0.0",
     "grunt-responsive-images": "^1.10.1",
+    "live-server": "^1.2.0",
     "node-sass": "^4.7.2",
     "npm-run-all": "^4.1.2"
   }

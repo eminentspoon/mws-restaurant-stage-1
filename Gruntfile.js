@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     responsive_images: {
-      dev: {
+      dist: {
         options: {
           engine: "im",
           sizes: [
@@ -44,22 +44,68 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            src: ["*.{gif,jpg,png}"],
-            cwd: "img_src/",
-            dest: "img/"
+            src: ["*.{gif,jpg,png,webp}"],
+            cwd: "src/img/",
+            dest: "dist/img/"
           }
         ]
       }
     },
     clean: {
-      dev: {
-        src: ["img"]
+      dist: {
+        src: ["dist/img", "dist/img/static", "dist/js"]
+      },
+      tidy: {
+        src: ["dist/css/*", "!dist/css/*.min.css"]
       }
     },
     mkdir: {
-      dev: {
+      dist: {
         options: {
-          create: ["img"]
+          create: ["dist/img", "dist/img/static", "dist/js"]
+        }
+      }
+    },
+    copy: {
+      dist: {
+        files: [
+          {
+            expand: true,
+            src: ["*.{gif,jpg,png,webp}"],
+            cwd: "src/img/static",
+            dest: "dist/img/static"
+          },
+          {
+            expand: true,
+            src: ["*.{html,json,ico}"],
+            cwd: "src/",
+            dest: "dist/"
+          }
+        ]
+      }
+    },
+    uglify: {
+      dist: {
+        options: {},
+        files: {
+          "dist/sw.min.js": ["src/sw.js"],
+          "dist/js/dbhelper.min.js": ["src/js/dbhelper.js"],
+          "dist/js/main.min.js": ["src/js/main.js"],
+          "dist/js/restaurant_info.min.js": ["src/js/restaurant_info.js"],
+          "dist/js/swhelper.min.js": ["src/js/swhelper.js"],
+          "dist/js/idb.min.js": ["node_modules/idb/lib/idb.js"]
+        }
+      }
+    },
+    cssmin: {
+      dist: {
+        files: {
+          "dist/css/styles.core.min.css": [
+            "dist/css/styles.base.css",
+            "dist/css/styles.sub.css"
+          ],
+          "dist/css/styles.large.min.css": ["dist/css/styles.large.css"],
+          "dist/css/styles.medium.min.css": ["dist/css/styles.medium.css"]
         }
       }
     }
@@ -67,7 +113,17 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks("grunt-responsive-images");
   grunt.loadNpmTasks("grunt-contrib-clean");
+  grunt.loadNpmTasks("grunt-contrib-uglify-es");
+  grunt.loadNpmTasks("grunt-contrib-cssmin");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-mkdir");
-  grunt.registerTask("default", ["clean", "mkdir", "responsive_images"]);
+  grunt.registerTask("default", [
+    "clean:dist",
+    "mkdir",
+    "responsive_images",
+    "copy",
+    "uglify",
+    "cssmin",
+    "clean:tidy"
+  ]);
 };
