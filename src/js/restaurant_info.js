@@ -29,11 +29,14 @@ window.initMap = () => {
     });
     const map = document.getElementById("map");
     if (map.classList.contains("failure")) {
-      //reshow is map was really slow to load in but still online
+      //reshow if map was really slow to load in but still online
       map.classList.remove("failure");
       document.getElementById("map-container").removeAttribute("aria-hidden");
     }
     DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+    google.maps.event.addListenerOnce(self.map, "idle", () => {
+      document.getElementsByTagName("iframe")[0].title = "Google Maps";
+    });
   } else {
     if (mapRetryAttempts < maxMapRetry) {
       mapRetryAttempts = mapRetryAttempts + 1;
