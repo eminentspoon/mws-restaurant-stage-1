@@ -54,7 +54,7 @@ The latest lighthouse audit figures are as follows:
 
 ### Releases
 
-- [v0.3]()
+- [v0.3](https://github.com/eminentspoon/mws-restaurant-stage-1/releases/tag/v0.3)
 
 The latest version of the source for stage 2 has been prebuilt and any devleopment files removed. If there are any problems running the project from the main source, this can be found in the releases area.
 
@@ -70,7 +70,11 @@ The initial source code first submitted for stage 1.
 
 #### Important project prerequisites
 
-1 - **Important:** _The grunt taskrunner uses ImageMagick to create images for different viewports. This will **need** to be installed for the project to be able to be run. Please see [here](https://www.imagemagick.org/script/download.php) for installation details for your platform_.
+1 - The grunt taskrunner uses ImageMagick to create images for different viewports. This will **need** to be installed for the project to be able to be run. Please see [here](https://www.imagemagick.org/script/download.php) for installation details for your platform.
+
+2 - The project relies on the API server for [stage 2](https://github.com/eminentspoon/mws-restaurant-stage-2) to be running on port 1337 on the same machine as this site.
+
+#### Building the project
 
 The project has been set up as an npm project. In order to get the required dependencies, run:
 
