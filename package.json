@@ -4,7 +4,7 @@
   "description": "Stage 1 of the MWS Restaurant Review website",
   "main": "index.html",
   "scripts": {
-    "start": "npm-run-all build:sass grunt serve",
+    "build": "npm-run-all build:sass grunt",
     "grunt": "grunt",
     "build:sass": "node-sass -r src/scss/ -o dist/css/",
     "watch:sass": "node-sass -w src/scss/ -o dist/css/",
