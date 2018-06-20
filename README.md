@@ -4,59 +4,73 @@
 
 #### _Three Stage Course Material Project - Restaurant Reviews_
 
-## Project Overview: Stage 1
+## Project Overview: Stage 2
 
-For the **Restaurant Reviews** projects, you will incrementally convert a static webpage to a mobile-ready web application. In **Stage One**, you will take a static design that lacks accessibility and convert the design to be responsive on different sized displays and accessible for screen reader use. You will also add a service worker to begin the process of creating a seamless offline experience for your users.
+For the **Restaurant Reviews** projects, you will incrementally convert a static webpage to a mobile-ready web application. In **Stage Two**, you will take the responsive, accessible design you build in **Stage One** and connect it to an external server.
 
 ### Aims
 
-#### UI compatible with a range of display sizes
+#### Use server data instead of local memory
 
-* All content is responsive and displays on a range of display sizes - ✓
-* Content should make use of available screen real estates and should display correctly oat all screen sizes - ✓
-* An image's associated title and text renders next to the image in all viewport sizes - ✓
+- Pull all data from the server rather than local file - ✓
+- Use response data to generate restaurant information on main page - ✓
+- Use response data to generate restaurant information on restaurant page - ✓
 
-#### Responsive images
+#### Use IndexedDB to cache JSON responses
 
-* Images in the size are sized appropariately to the viewport and do not crowd or overlap other elements in the browser, regardless of viewport size - ✓
+- Update service worker to store JSON received by request using IndexedDB API - ✓
+- Each page should be available offline with data pulled from IDB - ✓
 
-#### Application elements useable in all viewports
+#### Meet the minmum performance requirements
 
-* On the main page: restaurants and images are displayed in all viewports - ✓
-* On the details page: a maap, hours and reviews are displayed in all viewports - ✓
+- Main page - Lighthouse 'Progressive Web App' score should be 90 or better - ✓
+- Restaurant page - Lighthouse 'Progressive Web App' score should be 90 or better - ✓
+- Main page - Lighthouse 'Performance' score should be 70 or better - ✓
+- Restaurant page - Lighthouse 'Performance' score should be 70 or better - ✓
+- Main page - Lighthouse 'Accessibility' score should be 90 or better - ✓
+- Restaurant page - Lighthouse 'Accessibility' score should be 90 or better - ✓
 
-#### Accessible images
+### Lighthouse results
 
-* All content related images include appropriate alternate text that clearly describe the content of the image - ✓
+The latest lighthouse audit figures are as follows:
 
-#### Focus
+|               | Main Page | Restaurant Page |
+| ------------- | :-------: | :-------------: |
+| PWA           |    91     |       91        |
+| Performance   |    73     |       78        |
+| Accessibility |    100    |       100       |
 
-* Focus is appropriately managed allowing users to noticeably tab through each of the important elements of the page - ✓
-* Modal of interstitial windows appropriately focus lock - N/A
+### Changes in this version
 
-#### Semantic site elements
-
-* Elements on the page use the appropriate semantic elements - ✓
-* For elements in which a semantic element is not available, appropriate ARIA roles are defined - ✓
-
-#### Visited pages available offline
-
-* When available to the browser, a service worker caches responses to requests for site assets - ✓
-* Visited pages are rendered when there is no network access - ✓
+- Source files moved into /src directory
+- Source files now built into /dist directory
+- JS files now minified
+- CSS files now minified
+- Applicable CSS files combined
+- Image files changed to webp format
+- [IndexedDB Promised](https://github.com/jakearchibald/idb) used to interact with IndexedDB
+- Fetch used to interact with API
+- Manifest added
 
 ### Releases
 
+- [v0.3]()
+
+The latest version of the source for stage 2 has been prebuilt and any devleopment files removed. If there are any problems running the project from the main source, this can be found in the releases area.
+
 - [v0.2](https://github.com/eminentspoon/mws-restaurant-stage-1/releases/tag/v0.2)
 
-The latest version of the source has been prebuilt and any development files removed. If there are any problems running the project from the main source, this can be found in the releases area.
+The final version of the source for stage 1 has been prebuilt and any development files removed. If there are any problems running the project from the main source, this can be found in the releases area.
 
 - [v0.1](https://github.com/eminentspoon/mws-restaurant-stage-1/releases/tag/v0.1)
 
 The initial source code first submitted for stage 1.
 
-### Building the project
+### Building and running the project
 
-**Important:** _The grunt taskrunner uses ImageMagick to create images for different viewports. This will need to be installed for the project to be able to be run. Please see [here](https://www.imagemagick.org/script/download.php) for installation details for your platform_.
+#### Important project prerequisites
+
+1 - **Important:** _The grunt taskrunner uses ImageMagick to create images for different viewports. This will **need** to be installed for the project to be able to be run. Please see [here](https://www.imagemagick.org/script/download.php) for installation details for your platform_.
 
 The project has been set up as an npm project. In order to get the required dependencies, run:
 
@@ -64,25 +78,31 @@ The project has been set up as an npm project. In order to get the required depe
 npm install
 ```
 
-Once all the required dependencies are installed, run the following command to launch the project:
+Once all the required dependencies are installed, run the following command to build the project into the dist:
 
 ```
-npm start
+npm build
 ```
 
-This will generate the stylesheets, images and launch the web server for the project. Further details on the commands can been found in the **Available npm scripts** section.
+This will generate the stylesheets, images and scripts into the dist folder.
+
+```
+npm serve
+```
+
+This will serve the latest built source in the dist directory.
 
 #### Project details
 
-* Uses SASS for stylesheets
-  * The reason for using SASS is it allows a more structured stylesheet layout and includes benefits such as centralised variables for things like colours.
-* Uses grunt for responsive image actions
-  * The reason for using grunt is it has available plugins for generating images based upon specified sizes and qualities.
-* Uses live-server to run the server
-  * The reason for using live-server is it automatically injects code into each page to automatically apply css changes as well as automatically refreshing whenever files change.
+- Uses SASS for stylesheets
+  - The reason for using SASS is it allows a more structured stylesheet layout and includes benefits such as centralised variables for things like colours.
+- Uses grunt for responsive image actions, minification and combining files
+  - The reason for using grunt is it has available plugins for generating images based upon specified sizes and qualities as well as minification of CSS and JS.
+- Uses live-server to run the server
+  - The reason for using live-server is it automatically injects code into each page to automatically apply css changes as well as automatically refreshing whenever files change.
 
-- Uses npm-run-all to run scripts
-  * The reason for using npm-run-all is it allows multiple npm scripts to be chained in a single command.
+* Uses npm-run-all to run scripts
+  - The reason for using npm-run-all is it allows multiple npm scripts to be chained in a single command.
 
 #### Available npm scripts
 
@@ -111,17 +131,7 @@ npm run serve
 Launches the project using live-server on port 8000, automatically opening in the default browser. **Note:** live-server launches using 127.0.0.1 rather than localhost, this should work fine with the project.
 
 ```
-npm start
+npm run build
 ```
 
-Chains the above commands into a single action. This has the result of generating images, building any existing SASS files, setting up a watch on /sass directory for any future updates and launching live-server ready for viewing / development.
-
-### Future Improvements
-
-#### General
-
-1.  Add build step to minify CSS and JS
-
-#### Service Worker
-
-1.  Update stale cache content on successful network request
+Chains the the build commands into a single action. This has the result of generating images, building any existing SASS files, setting up a watch on /sass directory for any future updates and launching live-server ready for viewing / development.
