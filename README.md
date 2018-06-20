@@ -6,7 +6,7 @@
 
 ## Project Overview: Stage 2
 
-For the **Restaurant Reviews** projects, you will incrementally convert a static webpage to a mobile-ready web application. In **Stage Two**, you will take the responsive, accessible design you build in **Stage One** and connect it to an external server.
+For the **Restaurant Reviews** projects, you will incrementally convert a static webpage to a mobile-ready web application. In **Stage Two**, you will take the responsive, accessible design you built in **Stage One** and connect it to an external server.
 
 ### Aims
 
@@ -43,10 +43,10 @@ The latest lighthouse audit figures are as follows:
 ### Changes in this version
 
 - Source files moved into /src directory
-- Source files now built into /dist directory
-- JS files now minified
-- CSS files now minified
-- Applicable CSS files combined
+- Source files now built into /dist directory using build command
+- JS files now minified on build
+- CSS files now minified on build
+- Applicable CSS files combined on build
 - Image files changed to webp format
 - [IndexedDB Promised](https://github.com/jakearchibald/idb) used to interact with IndexedDB
 - Fetch used to interact with API
@@ -70,7 +70,7 @@ The initial source code first submitted for stage 1.
 
 #### Important project prerequisites
 
-1 - The grunt taskrunner uses ImageMagick to create images for different viewports. This will **need** to be installed for the project to be able to be run. Please see [here](https://www.imagemagick.org/script/download.php) for installation details for your platform.
+1 - The grunt taskrunner uses ImageMagick to create images for different viewports. This will **need** to be installed for the project to be able to be built. Please see [here](https://www.imagemagick.org/script/download.php) for installation details for your platform.
 
 2 - The project relies on the API server for [stage 2](https://github.com/eminentspoon/mws-restaurant-stage-2) to be running on port 1337 on the same machine as this site.
 
