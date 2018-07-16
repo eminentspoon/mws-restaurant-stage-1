@@ -6,6 +6,7 @@ let restaurantLoaded = false,
   dataFailed = false,
   mapInited = false;
 var map;
+let notificationManager;
 const desktopMedia = "(min-width: 900px)";
 const mediumMedia = "(min-width: 550px) and (max-width: 899px)";
 const baseMedia = "(max-width: 549px)";
@@ -48,6 +49,7 @@ window.initMap = () => {
 };
 
 document.addEventListener("DOMContentLoaded", event => {
+  notificationManager = new NotificationManager();
   const restId = getRestaurantIdFromUrl();
   if (!restId) {
     // no id found in URL
@@ -78,6 +80,10 @@ setupRestaurantFavourite = restId => {
       restaurantId,
       !(Number(currentState) === 1)
     ).then(o => {
+      notificationManager.showMessage(
+        "Restaurant favourite status updated on server",
+        false
+      );
       setFavouriteStatusFromServer(restaurantId);
     });
   });
