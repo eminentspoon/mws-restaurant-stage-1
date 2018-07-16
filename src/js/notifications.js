@@ -1,4 +1,4 @@
-class Notifications {
+class NotificationManager {
   constructor() {
     this.messageId = 0;
   }
@@ -24,6 +24,7 @@ class Notifications {
     if (isError) {
       messageContainer.classList.add("error");
     }
+    messageContainer.tabIndex = 0;
     messageContainer.setAttribute("data-messageid", newMessageId);
     messageContainer.setAttribute("role", "alert");
 
@@ -34,7 +35,13 @@ class Notifications {
 
     let closeButton = document.createElement("button");
     closeButton.innerText = "✖";
-    closeButton.setAttribute("aria-label", "Close this notification");
+    closeButton.setAttribute("role", "button");
+    closeButton.setAttribute(
+      "aria-label",
+      persistant
+        ? "Close this notification"
+        : "Notification will clear automatically"
+    );
     closeButton.onclick = e => {
       const msgId = newMessageId;
       e.preventDefault();
