@@ -213,6 +213,24 @@ createRestaurantHTML = (restaurant, totalCount, pos) => {
   li.setAttribute("aria-label", restaurant.name);
 
   li.append(createRestaurantImageHTML(restaurant));
+  if (restaurant.is_favorite === "true") {
+    const favouriteContainer = document.createElement("div");
+    favouriteContainer.classList.add("favourite-container");
+    favouriteContainer.setAttribute("aria-hidden", true);
+
+    const overlay = document.createElement("div");
+    overlay.classList.add("overlay");
+    favouriteContainer.appendChild(overlay);
+
+    const favouriteIcon = document.createElement("span");
+    favouriteIcon.classList.add("favourite");
+    favouriteIcon.title = `${
+      restaurant.name
+    } is one of your favourite restaurants`;
+    favouriteIcon.innerText = "★";
+    favouriteContainer.append(favouriteIcon);
+    li.append(favouriteContainer);
+  }
 
   const name = document.createElement("h2");
   name.innerHTML = restaurant.name;
