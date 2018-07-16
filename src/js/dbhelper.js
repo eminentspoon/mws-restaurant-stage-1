@@ -154,6 +154,52 @@ class DBHelper {
     });
   }
 
+  static async fetchFavourites() {
+    return fetch(`${DBHelper.API_ADDRESS}/?is_favorite=true`)
+      .then(resp => {
+        if (!resp.ok) {
+          throw Error(resp.statusText);
+        }
+        return resp.json();
+      })
+      .then(restaurants => {
+        return restaurants;
+      })
+      .catch(err => {
+        const error = `Unable to get list of favourite restaurants: ${err}`;
+        throw Error(error);
+      });
+  }
+
+  static async isRestaurantFavourite(restId) {
+    return this.fetchFavourites().then(restaurants => {
+      if (restaurants.filter(o => o.id === Number(restId)).length > 0) {
+        return true;
+      }
+      return false;
+    });
+  }
+
+  static async changeRestaurantFavouriteStatus(restId, isFavourite) {
+    return fetch(
+      `${
+        DBHelper.API_ADDRESS
+      }/${restId}/?is_favorite=${isFavourite.toString()}`,
+      {
+        method: "PUT"
+      }
+    )
+      .then(resp => {
+        if (!resp.ok) {
+          throw Error("Unable to perform restaurant favourite action: " + err);
+        }
+        return;
+      })
+      .catch(err => {
+        throw Error("Unable to perform restaurant favourite action: " + err);
+      });
+  }
+
   /**
    * Restaurant page URL.
    */
