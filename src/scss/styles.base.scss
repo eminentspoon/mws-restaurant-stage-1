@@ -502,6 +502,50 @@ body {
                 }
             }
         }
+
+        #notification-area {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            margin: 0 auto;
+            left: 0;
+
+            .notification {
+                width: 80%;
+                min-height: 80px;
+                margin: 0 auto;
+                background-color: #2ECC40;
+                border-radius: 5px;
+                margin-top: 10px;
+                display: flex;
+
+                &.error {
+                    background-color: #FF4136;
+                }
+
+                .message {
+                    font-size: 16px;
+                    color: white;
+                    font-weight: bold;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 20px;
+                    flex-grow: 1;
+                }
+
+                button {
+                    border: 0;
+                    background-color: transparent;
+                    font-size: 40px;
+                    color: white;
+                    padding: 10px;
+                    cursor: pointer;
+                    min-width: 48px;
+                    min-height: 48px;
+                }
+            }
+        }
     }
 
     #footer {
