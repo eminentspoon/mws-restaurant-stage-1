@@ -197,14 +197,13 @@ body {
                             text-align: center;
                             border: none;
                             background-color: transparent;
-                            border: 1px solid transparent;
 
                             &:focus {
-                                border: 1px solid $light-grey;
+                                outline-color: $gold;
                             }
 
                             &.checked {
-                                color: gold;
+                                color: $gold;
                             }
                         }
                     }
@@ -418,6 +417,10 @@ body {
                     &:last-child {
                         margin-bottom: 10px;
                     }
+
+                    &:focus {
+                        outline-color: $gold;
+                    }
                 }
             }
         }
@@ -447,6 +450,31 @@ body {
                     min-height: 380px;
                     width: 100%;
                     margin: 5px 0;
+                    position: relative;
+
+                    .favourite-container {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+
+                        .overlay {
+                            width: 0;
+                            height: 0;
+                            border-top: 70px solid rgba($light-grey, 0.6);
+                            border-left: 70px solid transparent;
+                        }
+
+                        .favourite {
+                            font-size: 38px;
+                            display: block;
+                            position: absolute;
+                            top: 0px;
+                            right: 0px;
+                            color: $gold;
+                            line-height: 48px;
+                            height: 48px;
+                        }
+                    }
 
                     .restaurant-img {
                         display: block;
@@ -496,8 +524,12 @@ body {
                     text-transform: uppercase;
                     width: 100%;
 
-                    &:hover {
+                    &:hover, &:focus {
                         text-decoration: underline;
+                    }
+
+                    &:focus {
+                        outline-color: $gold;
                     }
                 }
             }
@@ -514,13 +546,13 @@ body {
                 width: 80%;
                 min-height: 80px;
                 margin: 0 auto;
-                background-color: #2ECC40;
+                background-color: #2ecc40;
                 border-radius: 5px;
                 margin-top: 10px;
                 display: flex;
 
                 &.error {
-                    background-color: #FF4136;
+                    background-color: #ff4136;
                 }
 
                 .message {
