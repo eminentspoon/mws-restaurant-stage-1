@@ -48,46 +48,91 @@ window.initMap = () => {
 };
 
 document.addEventListener("DOMContentLoaded", event => {
-  fetchRestaurantFromURL();
+  const restId = getRestaurantIdFromUrl();
+  if (!restId) {
+    // no id found in URL
+    console.error("No restaurant id in URL");
+    window.location = "/";
+  } else {
+    fetchRestaurantFromURL(restId);
+    setupRestaurantFavourite(restId);
+  }
+
   SWHelper.registerServiceWorker();
   document.getElementById("skipmap").addEventListener("click", e => {
     document.getElementById("restaurant-container").focus();
   });
 });
 
+getRestaurantIdFromUrl = () => {
+  return getParameterByName("id");
+};
+
+setupRestaurantFavourite = restId => {
+  const favouriteBlock = document.querySelector("#favourite-set");
+  favouriteBlock.addEventListener("click", e => {
+    e.preventDefault();
+    const restaurantId = restId;
+    const currentState = e.target.getAttribute("data-favourite");
+    DBHelper.changeRestaurantFavouriteStatus(
+      restaurantId,
+      !(Number(currentState) === 1)
+    ).then(o => {
+      setFavouriteStatusFromServer(restaurantId);
+    });
+  });
+
+  setFavouriteStatusFromServer(restId);
+};
+
+setFavouriteStatusFromServer = restId => {
+  const favouriteBlock = document.querySelector("#favourite-set");
+  DBHelper.isRestaurantFavourite(restId).then(resp => {
+    if (resp) {
+      favouriteBlock.classList.add("checked");
+      favouriteBlock.setAttribute(
+        "aria-label",
+        "Remove restaurant as a favourite"
+      );
+      favouriteBlock.setAttribute("title", "Remove restaurant as a favourite");
+      favouriteBlock.setAttribute("data-favourite", "1");
+      return;
+    }
+    favouriteBlock.classList.remove("checked");
+    favouriteBlock.setAttribute("aria-label", "Mark restaurant as a favourite");
+    favouriteBlock.setAttribute("title", "Mark restaurant as a favourite");
+    favouriteBlock.setAttribute("data-favourite", "0");
+  });
+};
+
 /**
  * Get current restaurant from page URL.
  */
-fetchRestaurantFromURL = () => {
+fetchRestaurantFromURL = restId => {
   if (self.restaurant) {
     return;
   }
-  const id = getParameterByName("id");
-  if (!id) {
-    // no id found in URL
-    console.error("No restaurant id in URL");
-  } else {
-    DBHelper.fetchRestaurantById(id, (error, restaurant) => {
-      self.restaurant = restaurant;
-      if (!restaurant) {
-        console.error(error);
+
+  DBHelper.fetchRestaurantById(restId, (error, restaurant) => {
+    self.restaurant = restaurant;
+    if (!restaurant) {
+      console.error(error);
+      return;
+    }
+    restaurantLoaded = true;
+    fillRestaurantHTML();
+    fillBreadcrumb();
+    setTimeout(() => {
+      if (mapInited) {
         return;
       }
-      restaurantLoaded = true;
-      fillRestaurantHTML();
-      fillBreadcrumb();
-      setTimeout(() => {
-        if (mapInited) {
-          return;
-        }
-        //add class to minimise and then hide from screen readers etc
-        document.getElementById("map").classList.add("failure");
-        document
-          .getElementById("map-container")
-          .setAttribute("aria-hidden", true);
-      }, mapHideTimer);
-    });
-  }
+      //add class to minimise and then hide from screen readers etc
+      document.getElementById("map").classList.add("failure");
+      document
+        .getElementById("map-container")
+        .setAttribute("aria-hidden", true);
+    }, mapHideTimer);
+  });
 };
 
 /**
