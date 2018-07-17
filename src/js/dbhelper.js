@@ -2,17 +2,24 @@
  * Common database helper functions.
  */
 class DBHelper {
-  static get API_ADDRESS() {
+  static get BASE_API_ADDRESS() {
     const port = 1337; // Change this to your server port
     const hostname = window.location.hostname;
-    return `http://${hostname}:${port}/restaurants`;
+
+    return `http://${hostname}:${port}`;
+  }
+  static get RESTAURANT_API_ADDRESS() {
+    return `${DBHelper.BASE_API_ADDRESS}/restaurants`;
+  }
+  static get REVIEW_API_ADDRESS() {
+    return `${DBHelper.BASE_API_ADDRESS}/reviews`;
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    fetch(DBHelper.API_ADDRESS)
+    fetch(DBHelper.RESTAURANT_API_ADDRESS)
       .then(resp => {
         if (!resp.ok) {
           throw Error(resp.statusText);
@@ -32,7 +39,7 @@ class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-    fetch(`${DBHelper.API_ADDRESS}/${id}`)
+    fetch(`${DBHelper.RESTAURANT_API_ADDRESS}/${id}`)
       .then(resp => {
         if (!resp.ok) {
           if (resp.status === 404) {
@@ -154,8 +161,31 @@ class DBHelper {
     });
   }
 
+  static async getReviewsForRestaurant(restId) {
+    return fetch(`${DBHelper.REVIEW_API_ADDRESS}/?restaurant_id=${restId}`)
+      .then(resp => {
+        return resp.json();
+      })
+      .then(reviews => {
+        return reviews;
+      });
+  }
+
+  static async createReview(reviewObject) {
+    return fetch(`${DBHelper.REVIEW_API_ADDRESS}`, {
+      body: JSON.stringify(reviewObject),
+      method: "POST"
+    })
+      .then(resp => {
+        return resp.json();
+      })
+      .then(createdReview => {
+        return createdReview;
+      });
+  }
+
   static async fetchFavourites() {
-    return fetch(`${DBHelper.API_ADDRESS}/?is_favorite=true`)
+    return fetch(`${DBHelper.RESTAURANT_API_ADDRESS}/?is_favorite=true`)
       .then(resp => {
         if (!resp.ok) {
           throw Error(resp.statusText);
@@ -183,7 +213,7 @@ class DBHelper {
   static async changeRestaurantFavouriteStatus(restId, isFavourite) {
     return fetch(
       `${
-        DBHelper.API_ADDRESS
+        DBHelper.RESTAURANT_API_ADDRESS
       }/${restId}/?is_favorite=${isFavourite.toString()}`,
       {
         method: "PUT"
