@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", event => {
   } else {
     fetchRestaurantFromURL(restId);
     setupRestaurantFavourite(restId);
+    setupRestaurantReview(restId);
   }
 
   SWHelper.registerServiceWorker();
@@ -65,6 +66,138 @@ document.addEventListener("DOMContentLoaded", event => {
     document.getElementById("restaurant-container").focus();
   });
 });
+
+setupRestaurantReview = restId => {
+  const addReviewBtn = document.getElementById("review-add");
+  addReviewBtn.addEventListener("click", () => {
+    showReviewAdditionForm(restId);
+  });
+  const dialog = document.getElementById("review-dialog");
+  dialog.addEventListener("close", () => {
+    const commentsArea = document.getElementById("review-comments");
+    const ratingArea = document.querySelector("#review-rating");
+    const name = document.getElementById("review-name");
+    const elements = ratingArea.querySelectorAll("button.rating-button");
+    ratingArea.removeAttribute("data-selectedrating");
+    ratingArea.setAttribute("aria-label", `Restaurant not yet rated`);
+    name.value = "";
+    commentsArea.value = "";
+    elements.forEach(o => {
+      o.classList.remove("checked");
+    });
+  });
+
+  const dialogAdd = document.getElementById("dialog-add");
+  dialogAdd.addEventListener("click", addReview);
+
+  const dialogCancel = document.getElementById("dialog-cancel");
+  dialogCancel.addEventListener("click", closeReviewDialog);
+
+  const ratingElements = document.querySelectorAll("button.rating-button");
+  ratingElements.forEach(o => o.addEventListener("click", handleRatingClick));
+};
+
+function sanitiseText(str) {
+  var div = document.createElement("div");
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+handleRatingClick = e => {
+  let currEle = e.target;
+  let rating = Number(currEle.getAttribute("data-rating"));
+  const commentsArea = document.getElementById("review-comments");
+  const ratingArea = document.querySelector("#review-rating");
+  const elements = ratingArea.querySelectorAll("button.rating-button");
+  const elementCount = elements.length;
+  ratingArea.setAttribute("data-selectedrating", rating);
+  ratingArea.setAttribute("aria-label", `Rated ${rating} out of 5`);
+
+  for (let i = 0; i < elementCount; i++) {
+    let currentElement = elements[i];
+    if (i + 1 <= rating) {
+      if (!currentElement.classList.contains("checked")) {
+        currentElement.classList.add("checked");
+      }
+      continue;
+    }
+    currentElement.classList.remove("checked");
+  }
+  commentsArea.focus();
+};
+
+closeReviewDialog = () => {
+  const dialog = document.getElementById("review-dialog");
+  dialog.close();
+};
+
+addReview = async () => {
+  let errors = [];
+  let isErrored = false;
+  const name = sanitiseText(document.getElementById("review-name").value);
+  const dialog = document.getElementById("review-dialog");
+  const rating = document.getElementById("review-rating");
+  let selectedRating = sanitiseText(rating.getAttribute("data-selectedrating"));
+  const comments = sanitiseText(
+    document.getElementById("review-comments").value
+  );
+
+  if (name.length === 0) {
+    errors.push("Name must be provided");
+    isErrored = true;
+  }
+
+  if (
+    !selectedRating ||
+    Number(selectedRating) < 1 ||
+    Number(selectedRating) > 5
+  ) {
+    errors.push("Rating must be provided");
+    isErrored = true;
+  }
+
+  if (comments.length === 0) {
+    errors.push("Comments must be provided");
+    isErrored = true;
+  }
+
+  if (isErrored) {
+    let errorText = "Unable to create review:\r\n";
+
+    if (errors.length > 1) {
+      for (let i = 0; i < errors.length; i++) {
+        errorText += errors[i];
+        if (i < errors.length - 1) {
+          errorText += "\r\n";
+        }
+      }
+    } else {
+      errorText += errors[0];
+    }
+
+    notificationManager.showError(errorText, false);
+    return;
+  }
+
+  const createdReview = await DBHelper.createReview({
+    restaurant_id: Number(getRestaurantIdFromUrl()),
+    name: name,
+    rating: Number(selectedRating),
+    comments: comments
+  });
+  addSingleReviewToPage(createdReview);
+  notificationManager.showMessage(
+    "Your review has been added successfully",
+    false
+  );
+  dialog.close();
+};
+
+showReviewAdditionForm = restId => {
+  let dialog = document.getElementById("review-dialog");
+  dialog.setAttribute("data-restid", restId);
+  dialog.showModal();
+};
 
 getRestaurantIdFromUrl = () => {
   return getParameterByName("id");
@@ -217,7 +350,8 @@ fillRestaurantHoursHTML = (
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = async () => {
+  const reviews = await DBHelper.getReviewsForRestaurant(self.restaurant.id);
   const container = document.getElementById("reviews-container");
 
   if (!reviews) {
@@ -232,6 +366,15 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     ul.appendChild(createReviewHTML(reviews[i], reviewCount, i + 1));
   }
   container.appendChild(ul);
+};
+
+addSingleReviewToPage = review => {
+  const ul = document.getElementById("reviews-list");
+  let currEntries = ul.querySelectorAll("li");
+  const currEntryLength = currEntries.length + 1;
+
+  currEntries.forEach(o => o.setAttribute("aria-setsize", currEntryLength));
+  ul.appendChild(createReviewHTML(review, currEntryLength, currEntryLength));
 };
 
 /**
@@ -252,7 +395,7 @@ createReviewHTML = (review, totalCount, pos) => {
 
   const date = document.createElement("p");
   date.classList.add("date");
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.updatedAt).toDateString();
   li.appendChild(date);
 
   const rating = document.createElement("div");
