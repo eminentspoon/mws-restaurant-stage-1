@@ -10,6 +10,7 @@ const baseCacheValues = [
   "/js/main.min.js",
   "/js/swhelper.min.js",
   "/js/restaurant_info.min.js",
+  "/js/notifications.min.js",
   "/favicon.ico",
   "/img/static/default-image.webp",
   "/img/static/placeholder.webp",
@@ -26,28 +27,31 @@ const version = "v0.2";
 const storeVersion = 1;
 const uniquePrefix = "restaurantreviews";
 const internalCache = `${uniquePrefix}-static-${version}`;
-const dataUrl = `http://${location.hostname}:1337/restaurants`;
+const restaurantDataUrl = `http://${location.hostname}:1337/restaurants`;
+const reviewsUrl = `http://${location.hostname}:1337/reviews`;
 const storeName = `${uniquePrefix}-store`;
-const objectStoreName = "restaurants";
+const restaurantStore = "restaurants";
+const reviewStore = "reviews";
 
 initStore = () => {
   idb
     .open(storeName, storeVersion, upgradeDb => {
       switch (upgradeDb.oldVersion) {
         case 0:
-          upgradeDb.createObjectStore(objectStoreName, { keyPath: "id" });
+          upgradeDb.createObjectStore(restaurantStore, { keyPath: "id" });
+          upgradeDb.createObjectStore(reviewStore, { keyPath: "id" });
           break;
       }
     })
     .then(db => {
-      fetch(dataUrl)
+      fetch(restaurantDataUrl)
         .then(resp => {
           return resp.json();
         })
         .then(rests => {
-          const tx = db.transaction(objectStoreName, "readwrite");
+          const tx = db.transaction(restaurantStore, "readwrite");
           rests.map(rest => {
-            tx.objectStore(objectStoreName).put(rest);
+            tx.objectStore(restaurantStore).put(rest);
           });
         });
     });
@@ -61,7 +65,7 @@ cacheBaseAssets = () => {
 
 storeRestaurantData = () => {
   idb.open(storeName, storeVersion).then(db => {
-    var store = db.objectStoreNames[objectStoreName];
+    var store = db.objectStoreNames[restaurantStore];
   });
 };
 
@@ -116,20 +120,20 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   const urlString = event.request.url;
   const url = new URL(urlString);
-  if (urlString.startsWith(dataUrl)) {
+  if (urlString.startsWith(restaurantDataUrl)) {
     event.respondWith(
       fetch(event.request)
         .then(resp => {
           const originalResp = resp.clone();
           resp.json().then(rests => {
             getStore().then(db => {
-              const tx = db.transaction(objectStoreName, "readwrite");
+              const tx = db.transaction(restaurantStore, "readwrite");
               if (Array.isArray(rests)) {
                 rests.map(rest => {
-                  tx.objectStore(objectStoreName).put(rest);
+                  tx.objectStore(restaurantStore).put(rest);
                 });
               } else {
-                tx.objectStore(objectStoreName).put(rests);
+                tx.objectStore(restaurantStore).put(rests);
               }
             });
           });
@@ -141,7 +145,7 @@ self.addEventListener("fetch", event => {
           );
 
           return getStore().then(db => {
-            const tx = db.transaction(objectStoreName, "readonly");
+            const tx = db.transaction(restaurantStore, "readonly");
             if (isSingleRestaurant) {
               const restId = Number(
                 urlString.substring(
@@ -151,14 +155,14 @@ self.addEventListener("fetch", event => {
               );
 
               return tx
-                .objectStore(objectStoreName)
+                .objectStore(restaurantStore)
                 .get(restId)
                 .then(rest => {
                   return generateResponseFromJson(rest);
                 });
             } else {
               return tx
-                .objectStore(objectStoreName)
+                .objectStore(restaurantStore)
                 .getAll()
                 .then(restaurants => {
                   return generateResponseFromJson(restaurants);
