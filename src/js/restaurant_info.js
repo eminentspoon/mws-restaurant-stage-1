@@ -149,6 +149,7 @@ addReview = async () => {
 
   if (
     !selectedRating ||
+    isNaN(Number(selectedRating)) ||
     Number(selectedRating) < 1 ||
     Number(selectedRating) > 5
   ) {
@@ -365,7 +366,6 @@ fillReviewsHTML = async () => {
   for (let i = 0; i < reviewCount; i++) {
     ul.appendChild(createReviewHTML(reviews[i], reviewCount, i + 1));
   }
-  container.appendChild(ul);
 };
 
 addSingleReviewToPage = review => {
