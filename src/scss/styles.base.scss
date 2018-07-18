@@ -122,6 +122,7 @@ body {
                 border: 0;
                 box-shadow: 0 4px 6px 0 rgba(12, 12, 12, 0.25);
                 padding: 10px;
+                max-width: 450px;
 
                 h3 {
                     text-align: center;
@@ -135,7 +136,6 @@ body {
                 .form-field {
                     width: 100%;
                     float: left;
-                    margin: 0 10px 10px 10px;
 
                     #review-rating {
                         button.rating-button {
@@ -167,7 +167,6 @@ body {
                     }
 
                     input, textarea {
-                        width: 90%;
                         border-radius: 4px;
                         height: 20px;
                         line-height: 20px;
@@ -175,9 +174,16 @@ body {
                         border: 1px solid $light-grey;
                         color: $dark-grey;
                         padding-left: 5px;
+                        margin: 0px;
+                        width: 100%;
+                        display: block;
+                        padding: 0 10px;
+                        box-sizing: border-box;
+                        margin-bottom: 20px;
                     }
 
                     textarea {
+                        resize: vertical;
                         height: 60px;
                     }
                 }
@@ -357,6 +363,18 @@ body {
                 width: 90%;
                 margin: 0 auto;
 
+                button#review-add {
+                    border: 0;
+                    border-radius: 4px;
+                    background-color: #217cba;
+                    padding: 15px;
+                    color: #fff;
+                    font-weight: 700;
+                    cursor: pointer;
+                    display: block;
+                    margin: 15px auto;
+                }
+
                 h3 {
                     color: $accent-color;
                     font-size: $subheader-size;
@@ -388,6 +406,7 @@ body {
                             &.name {
                                 font-weight: $heavy-font-weight;
                                 font-size: 1.3em;
+                                word-break: break-word;
                             }
 
                             &.date {
