@@ -63,12 +63,6 @@ cacheBaseAssets = () => {
   });
 };
 
-storeRestaurantData = () => {
-  idb.open(storeName, storeVersion).then(db => {
-    var store = db.objectStoreNames[restaurantStore];
-  });
-};
-
 cleanOldCaches = () => {
   caches.keys().then(cacheNames => {
     return Promise.all(
