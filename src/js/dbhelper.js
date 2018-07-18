@@ -38,13 +38,12 @@ class DBHelper {
   /**
    * Fetch a restaurant by its ID.
    */
-  static fetchRestaurantById(id, callback) {
-    fetch(`${DBHelper.RESTAURANT_API_ADDRESS}/${id}`)
+  static async fetchRestaurantById(id) {
+    return fetch(`${DBHelper.RESTAURANT_API_ADDRESS}/${id}`)
       .then(resp => {
         if (!resp.ok) {
           if (resp.status === 404) {
-            callback("Restaurant does not exist", null);
-            return;
+            throw Error("Restaurant does not exist");
           }
 
           throw Error(resp.statusText);
@@ -52,11 +51,11 @@ class DBHelper {
         return resp.json();
       })
       .then(restaurant => {
-        callback(null, restaurant);
+        return restaurant;
       })
       .catch(err => {
         const error = `Unable to get restaurant: ${err}`;
-        callback(error, null);
+        throw Error(error);
       });
   }
 
@@ -201,14 +200,14 @@ class DBHelper {
       });
   }
 
-  static async isRestaurantFavourite(restId) {
-    return this.fetchFavourites().then(restaurants => {
-      if (restaurants.filter(o => o.id === Number(restId)).length > 0) {
-        return true;
-      }
-      return false;
-    });
-  }
+  // static async isRestaurantFavourite(restId) {
+  //   return this.fetchFavourites().then(restaurants => {
+  //     if (restaurants.filter(o => o.id === Number(restId)).length > 0) {
+  //       return true;
+  //     }
+  //     return false;
+  //   });
+  // }
 
   static async changeRestaurantFavouriteStatus(restId, isFavourite) {
     return fetch(
