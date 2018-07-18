@@ -56,9 +56,10 @@ document.addEventListener("DOMContentLoaded", event => {
     console.error("No restaurant id in URL");
     window.location = "/";
   } else {
-    fetchRestaurantFromURL(restId);
-    setupRestaurantFavourite(restId);
-    setupRestaurantReview(restId);
+    fetchRestaurantFromURL(restId).then(o => {
+      setupRestaurantFavourite(restId);
+      setupRestaurantReview(restId);
+    });
   }
 
   SWHelper.registerServiceWorker();
@@ -210,25 +211,27 @@ setupRestaurantFavourite = restId => {
     e.preventDefault();
     const restaurantId = restId;
     const currentState = e.target.getAttribute("data-favourite");
-    DBHelper.changeRestaurantFavouriteStatus(
-      restaurantId,
-      !(Number(currentState) === 1)
-    ).then(o => {
-      notificationManager.showMessage(
-        "Restaurant favourite status updated on server",
-        false
-      );
-      setFavouriteStatusFromServer(restaurantId);
-    });
+    const newStatus = !(Number(currentState) === 1);
+
+    DBHelper.changeRestaurantFavouriteStatus(restaurantId, newStatus).then(
+      o => {
+        notificationManager.showMessage(
+          "Restaurant favourite status updated on server",
+          false
+        );
+        self.restaurant.is_favorite = newStatus;
+        setFavouriteStatusOnPage();
+      }
+    );
   });
 
-  setFavouriteStatusFromServer(restId);
+  setFavouriteStatusOnPage();
 };
 
-setFavouriteStatusFromServer = restId => {
+setFavouriteStatusOnPage = () => {
   const favouriteBlock = document.querySelector("#favourite-set");
-  DBHelper.isRestaurantFavourite(restId).then(resp => {
-    if (resp) {
+  if (self.restaurant) {
+    if (self.restaurant.is_favorite) {
       favouriteBlock.classList.add("checked");
       favouriteBlock.setAttribute(
         "aria-label",
@@ -242,37 +245,38 @@ setFavouriteStatusFromServer = restId => {
     favouriteBlock.setAttribute("aria-label", "Mark restaurant as a favourite");
     favouriteBlock.setAttribute("title", "Mark restaurant as a favourite");
     favouriteBlock.setAttribute("data-favourite", "0");
-  });
+  }
 };
 
 /**
  * Get current restaurant from page URL.
  */
-fetchRestaurantFromURL = restId => {
+fetchRestaurantFromURL = async restId => {
   if (self.restaurant) {
     return;
   }
+  return DBHelper.fetchRestaurantById(restId)
+    .then(restaurant => {
+      self.restaurant = restaurant;
+      restaurantLoaded = true;
+      fillRestaurantHTML();
+      fillBreadcrumb();
+      setTimeout(() => {
+        if (mapInited) {
+          return;
+        }
+        //add class to minimise and then hide from screen readers etc
+        document.getElementById("map").classList.add("failure");
+        document
+          .getElementById("map-container")
+          .setAttribute("aria-hidden", true);
+      }, mapHideTimer);
 
-  DBHelper.fetchRestaurantById(restId, (error, restaurant) => {
-    self.restaurant = restaurant;
-    if (!restaurant) {
-      console.error(error);
       return;
-    }
-    restaurantLoaded = true;
-    fillRestaurantHTML();
-    fillBreadcrumb();
-    setTimeout(() => {
-      if (mapInited) {
-        return;
-      }
-      //add class to minimise and then hide from screen readers etc
-      document.getElementById("map").classList.add("failure");
-      document
-        .getElementById("map-container")
-        .setAttribute("aria-hidden", true);
-    }, mapHideTimer);
-  });
+    })
+    .catch(err => {
+      notificationManager.showError(err.text, true);
+    });
 };
 
 /**
