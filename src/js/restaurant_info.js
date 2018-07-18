@@ -219,7 +219,7 @@ setupRestaurantFavourite = restId => {
           "Restaurant favourite status updated on server",
           false
         );
-        self.restaurant.is_favorite = newStatus;
+        self.restaurant.is_favorite = newStatus ? "true" : "false";
         setFavouriteStatusOnPage();
       }
     );
@@ -231,7 +231,7 @@ setupRestaurantFavourite = restId => {
 setFavouriteStatusOnPage = () => {
   const favouriteBlock = document.querySelector("#favourite-set");
   if (self.restaurant) {
-    if (self.restaurant.is_favorite) {
+    if (self.restaurant.is_favorite === "true") {
       favouriteBlock.classList.add("checked");
       favouriteBlock.setAttribute(
         "aria-label",
