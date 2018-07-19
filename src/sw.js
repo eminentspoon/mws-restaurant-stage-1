@@ -1,5 +1,7 @@
 importScripts("js/idb.min.js");
 
+const defaultImage = "/img/static/default-image.webp";
+
 const baseCacheValues = [
   "/index.html",
   "/restaurant.html",
@@ -12,7 +14,7 @@ const baseCacheValues = [
   "/js/restaurant_info.min.js",
   "/js/notifications.min.js",
   "/favicon.ico",
-  "/img/static/default-image.webp",
+  defaultImage,
   "/img/static/placeholder.webp",
   "/img/static/icon-96x96.webp",
   "/img/static/icon-128x128.webp",
@@ -105,7 +107,7 @@ checkCacheAndRespond = (cache, request) => {
       })
       .catch(err => {
         if (request.url.indexOf(".webp") > -1) {
-          return cache.match("/img/static/default-image.webp").then(resp => {
+          return cache.match(defaultImage).then(resp => {
             return resp;
           });
         }
