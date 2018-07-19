@@ -85,10 +85,18 @@ checkCacheAndRespond = (cache, request) => {
       return resp;
     }
 
-    return fetch(request).then(networkResp => {
-      cache.put(request, networkResp.clone());
-      return networkResp;
-    });
+    return fetch(request)
+      .then(networkResp => {
+        cache.put(request, networkResp.clone());
+        return networkResp;
+      })
+      .catch(err => {
+        if (request.url.indexOf(".webp") > -1) {
+          return cache.match("/img/static/default-image.webp").then(resp => {
+            return resp;
+          });
+        }
+      });
   });
 };
 
