@@ -294,7 +294,6 @@ getUnsubmittedReviewsByRestaurants = async restId => {
       .index("restaurant_id")
       .getAll(restId)
       .then(reviews => {
-        console.log(reviews);
         return reviews;
       });
   });
