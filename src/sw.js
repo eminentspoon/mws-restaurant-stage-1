@@ -42,10 +42,15 @@ initStore = () => {
       switch (upgradeDb.oldVersion) {
         case 0:
           upgradeDb.createObjectStore(restaurantStore, { keyPath: "id" });
-          upgradeDb.createObjectStore(reviewStore, {
+
+          let createdReviewStore = upgradeDb.createObjectStore(reviewStore, {
             keyPath: "id"
           });
-          var unsubmittedStore = upgradeDb.createObjectStore(
+          createdReviewStore.createIndex("restaurant_id", "restaurant_id", {
+            unique: false
+          });
+
+          let unsubmittedStore = upgradeDb.createObjectStore(
             unsubmittedReviewStore,
             {
               keyPath: "id",
@@ -279,11 +284,10 @@ getReviewsByRestaurants = async restId => {
     const tx = db.transaction(reviewStore, "readonly");
     return tx
       .objectStore(reviewStore)
-      .getAll()
+      .index("restaurant_id")
+      .getAll(restId)
       .then(reviews => {
-        results = reviews.filter(o => o.restaurant_id === Number(restId));
-
-        return results;
+        return reviews;
       });
   });
 };
