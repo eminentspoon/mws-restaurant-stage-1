@@ -23,15 +23,16 @@ const baseCacheValues = [
   "/img/static/icon-512x512.webp"
 ];
 
-const version = "v0.2";
+const version = "v0.3";
 const storeVersion = 1;
 const uniquePrefix = "restaurantreviews";
 const internalCache = `${uniquePrefix}-static-${version}`;
-const restaurantDataUrl = `http://${location.hostname}:1337/restaurants`;
-const reviewsUrl = `http://${location.hostname}:1337/reviews`;
+const restaurantApiUrl = `http://${location.hostname}:1337/restaurants`;
+const reviewsApiUrl = `http://${location.hostname}:1337/reviews`;
 const storeName = `${uniquePrefix}-store`;
 const restaurantStore = "restaurants";
 const reviewStore = "reviews";
+const unsubmittedReviewStore = "reviews-pending";
 
 initStore = () => {
   idb
@@ -39,12 +40,24 @@ initStore = () => {
       switch (upgradeDb.oldVersion) {
         case 0:
           upgradeDb.createObjectStore(restaurantStore, { keyPath: "id" });
-          upgradeDb.createObjectStore(reviewStore, { keyPath: "id" });
+          upgradeDb.createObjectStore(reviewStore, {
+            keyPath: "id"
+          });
+          var unsubmittedStore = upgradeDb.createObjectStore(
+            unsubmittedReviewStore,
+            {
+              keyPath: "id",
+              autoIncrement: true
+            }
+          );
+          unsubmittedStore.createIndex("restaurant_id", "restaurant_id", {
+            unique: false
+          });
           break;
       }
     })
     .then(db => {
-      fetch(restaurantDataUrl)
+      fetch(restaurantApiUrl)
         .then(resp => {
           return resp.json();
         })
@@ -122,7 +135,8 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   const urlString = event.request.url;
   const url = new URL(urlString);
-  if (urlString.startsWith(restaurantDataUrl)) {
+
+  if (urlString.startsWith(restaurantApiUrl)) {
     event.respondWith(
       fetch(event.request)
         .then(resp => {
@@ -175,6 +189,71 @@ self.addEventListener("fetch", event => {
     );
   }
 
+  if (urlString.startsWith(reviewsApiUrl)) {
+    if (urlString === reviewsApiUrl && event.request.method === "POST") {
+      event.respondWith(
+        fetch(event.request.clone())
+          .then(resp => {
+            const originalResp = resp.clone();
+            resp.json().then(review => {
+              getStore().then(db => {
+                const tx = db.transaction(reviewStore, "readwrite");
+                tx.objectStore(reviewStore).put(review);
+              });
+            });
+            return originalResp;
+          })
+          .catch(err => {
+            return event.request.json().then(o => {
+              return getStore().then(db => {
+                const createdDate = new Date().toISOString();
+                o.createdAt = createdDate;
+                o.updatedAt = createdDate;
+                const tx = db.transaction(unsubmittedReviewStore, "readwrite");
+                tx.objectStore(unsubmittedReviewStore).put(o);
+                return generateResponseFromJson(o);
+              });
+            });
+          })
+      );
+    }
+
+    if (urlString.startsWith(`${reviewsApiUrl}/?restaurant_id=`)) {
+      const restId = Number(
+        urlString.replace(`${reviewsApiUrl}/?restaurant_id=`, "")
+      );
+      event.respondWith(
+        fetch(event.request)
+          .then(resp => {
+            const originalResp = resp.clone();
+            resp.json().then(reviews => {
+              getStore().then(db => {
+                const tx = db.transaction(reviewStore, "readwrite");
+                if (Array.isArray(reviews)) {
+                  reviews.map(review => {
+                    tx.objectStore(reviewStore).put(review);
+                  });
+                } else {
+                  tx.objectStore(reviewStore).put(reviews);
+                }
+              });
+            });
+            return originalResp;
+          })
+          .catch(() => {
+            return getReviewsByRestaurants(restId).then(results => {
+              return getUnsubmittedReviewsByRestaurants(restId).then(
+                subResults => {
+                  subResults.forEach(o => results.push(o));
+                  return generateResponseFromJson(results);
+                }
+              );
+            });
+          })
+      );
+    }
+  }
+
   if (url.origin === location.origin) {
     event.respondWith(
       caches.open(internalCache).then(cache => {
@@ -192,3 +271,31 @@ self.addEventListener("fetch", event => {
     );
   }
 });
+
+getReviewsByRestaurants = async restId => {
+  return getStore().then(db => {
+    const tx = db.transaction(reviewStore, "readonly");
+    return tx
+      .objectStore(reviewStore)
+      .getAll()
+      .then(reviews => {
+        results = reviews.filter(o => o.restaurant_id === Number(restId));
+
+        return results;
+      });
+  });
+};
+
+getUnsubmittedReviewsByRestaurants = async restId => {
+  return getStore().then(db => {
+    const tx = db.transaction(unsubmittedReviewStore, "readonly");
+    return tx
+      .objectStore(unsubmittedReviewStore)
+      .index("restaurant_id")
+      .getAll(restId)
+      .then(reviews => {
+        console.log(reviews);
+        return reviews;
+      });
+  });
+};
