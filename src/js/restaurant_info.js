@@ -193,7 +193,34 @@ addReview = async () => {
     false
   );
   dialog.close();
+
+  // if (!(await backgroundReviewSyncRegistered())) {
+  //   submitOfflineReviews();
+  // }
 };
+
+// backgroundReviewSyncRegistered = () => {
+//   return navigator.serviceWorker.ready
+//     .then(reg => {
+//       return reg.sync.getTags();
+//     })
+//     .then(tags => {
+//       if (tags.includes("submit-reviews")) {
+//         console.log("already registered review sync");
+//         return true;
+//       }
+//       console.log("not registerd yet");
+//       return false;
+//     });
+// };
+
+// submitOfflineReviews = async () => {
+//   console.log("submit offline reviews called");
+//   return navigator.serviceWorker.ready.then(reg => {
+//     console.log("service worker isd ready");
+//     return reg.sync.register("submit-reviews");
+//   });
+// };
 
 showReviewAdditionForm = restId => {
   let dialog = document.getElementById("review-dialog");
