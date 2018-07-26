@@ -184,15 +184,6 @@ class DBHelper {
       });
   }
 
-  // static async isRestaurantFavourite(restId) {
-  //   return this.fetchFavourites().then(restaurants => {
-  //     if (restaurants.filter(o => o.id === Number(restId)).length > 0) {
-  //       return true;
-  //     }
-  //     return false;
-  //   });
-  // }
-
   static async changeRestaurantFavouriteStatus(restId, isFavourite) {
     return fetch(
       `${
