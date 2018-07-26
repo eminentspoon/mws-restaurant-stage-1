@@ -81,37 +81,11 @@ initStore = () => {
 self.addEventListener("message", event => {
   if (event.data === "sync-offline") {
     console.log("offline sync called");
-    syncOfflineContent()
-      .then(o => {
-        console.log("offline content synced successfully");
-      })
-      .catch(err => {
-        console.log("there was a problem syncing content", err);
-      });
+    syncOfflineContent().catch(err => {
+      console.error("There was a problem syncing offline content", err);
+    });
   }
 });
-
-// self.addEventListener("sync", event => {
-//   console.log("sync job called");
-//   if (event.tag === "submit-reviews") {
-//     event.waitUntil(
-//       new Promise((resolve, reject) => {
-//         console.log("it worked! yay for service workers");
-//         return resolve();
-//       })
-//     );
-
-//     // syncOfflineContent()
-//     // .then(o => {
-//     //   console.log("sync left successfully..");
-//     //   return Promise.resolve();
-//     // })
-//     // .catch(err => {
-//     //   console.log(err);
-//     //   return Promise.reject("unable to sync");
-//     // })
-//   }
-// });
 
 syncOfflineContent = async () => {
   const unsubmittedReviews = await getAllUnsubmittedReviews();
