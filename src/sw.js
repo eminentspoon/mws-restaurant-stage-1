@@ -60,6 +60,7 @@ initStore = () => {
           unsubmittedStore.createIndex("restaurant_id", "restaurant_id", {
             unique: false
           });
+
           break;
       }
     })
@@ -75,6 +76,93 @@ initStore = () => {
           });
         });
     });
+};
+
+self.addEventListener("message", event => {
+  if (event.data === "sync-offline") {
+    console.log("offline sync called");
+    syncOfflineContent()
+      .then(o => {
+        console.log("offline content synced successfully");
+      })
+      .catch(err => {
+        console.log("there was a problem syncing content", err);
+      });
+  }
+});
+
+// self.addEventListener("sync", event => {
+//   console.log("sync job called");
+//   if (event.tag === "submit-reviews") {
+//     event.waitUntil(
+//       new Promise((resolve, reject) => {
+//         console.log("it worked! yay for service workers");
+//         return resolve();
+//       })
+//     );
+
+//     // syncOfflineContent()
+//     // .then(o => {
+//     //   console.log("sync left successfully..");
+//     //   return Promise.resolve();
+//     // })
+//     // .catch(err => {
+//     //   console.log(err);
+//     //   return Promise.reject("unable to sync");
+//     // })
+//   }
+// });
+
+syncOfflineContent = async () => {
+  const unsubmittedReviews = await getAllUnsubmittedReviews();
+  const entriesToDelete = [];
+
+  console.log("our unsubmitted reviews are ", unsubmittedReviews);
+
+  return Promise.all(
+    unsubmittedReviews.map(review => {
+      const currId = review.id;
+      return fetch(reviewsApiUrl, {
+        method: "POST",
+        body: JSON.stringify(Object.assign(review, { id: undefined }))
+      })
+        .then(o => {
+          console.log("sucessfully added ", o);
+          entriesToDelete.push(currId);
+        })
+        .catch(err => {
+          console.log("fetch failed");
+          return Promise.reject(err);
+        });
+    })
+  )
+    .then(() => {
+      return Promise.all(
+        entriesToDelete.map(id => {
+          console.log("deleting ", id);
+          return deleteFromUnsubmittedReviews(id);
+        })
+      );
+    })
+    .catch(err => {
+      console.log("an error occured in a fetch");
+      return Promise.reject("something went wrong", err);
+    });
+};
+
+getAllUnsubmittedReviews = async () => {
+  return getStore().then(db => {
+    const tx = db.transaction(unsubmittedReviewStore, "readonly");
+
+    return tx.objectStore(unsubmittedReviewStore).getAll();
+  });
+};
+
+deleteFromUnsubmittedReviews = async id => {
+  return getStore().then(db => {
+    const tx = db.transaction(unsubmittedReviewStore, "readwrite");
+    return tx.objectStore(unsubmittedReviewStore).delete(id);
+  });
 };
 
 cacheBaseAssets = () => {
