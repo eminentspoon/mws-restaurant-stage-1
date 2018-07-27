@@ -231,7 +231,7 @@ setupRestaurantFavourite = restId => {
 setFavouriteStatusOnPage = () => {
   const favouriteBlock = document.querySelector("#favourite-set");
   if (self.restaurant) {
-    if (self.restaurant.is_favorite === "true") {
+    if (self.restaurant.is_favorite.toString() === "true") {
       favouriteBlock.classList.add("checked");
       favouriteBlock.setAttribute(
         "aria-label",
