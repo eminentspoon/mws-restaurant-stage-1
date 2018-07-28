@@ -35,6 +35,7 @@ const storeName = `${uniquePrefix}-store`;
 const restaurantStore = "restaurants";
 const reviewStore = "reviews";
 const unsubmittedReviewStore = "reviews-pending";
+const unsubmittedFavouriteStatus = "favourite-pending";
 
 initStore = () => {
   idb
@@ -61,6 +62,11 @@ initStore = () => {
             unique: false
           });
 
+          upgradeDb.createObjectStore(unsubmittedFavouriteStatus, {
+            keyPath: "restaurant_id",
+            autoIncrement: false
+          });
+
           break;
       }
     })
@@ -74,6 +80,7 @@ initStore = () => {
           rests.map(rest => {
             tx.objectStore(restaurantStore).put(rest);
           });
+          return tx.complete;
         });
     });
 };
@@ -81,15 +88,19 @@ initStore = () => {
 self.addEventListener("message", event => {
   if (event.data === "sync-offline") {
     console.log("offline sync called");
-    syncOfflineContent().catch(err => {
+    syncOfflineReviews().catch(err => {
+      console.error("There was a problem syncing offline content", err);
+    });
+
+    syncOfflineFavourites().catch(err => {
       console.error("There was a problem syncing offline content", err);
     });
   }
 });
 
-syncOfflineContent = async () => {
+syncOfflineReviews = async () => {
   const unsubmittedReviews = await getAllUnsubmittedReviews();
-  const entriesToDelete = [];
+  const reviewsToDelete = [];
 
   console.log("our unsubmitted reviews are ", unsubmittedReviews);
 
@@ -102,7 +113,7 @@ syncOfflineContent = async () => {
       })
         .then(o => {
           console.log("sucessfully added ", o);
-          entriesToDelete.push(currId);
+          reviewsToDelete.push(currId);
         })
         .catch(err => {
           console.log("fetch failed");
@@ -112,9 +123,50 @@ syncOfflineContent = async () => {
   )
     .then(() => {
       return Promise.all(
-        entriesToDelete.map(id => {
+        reviewsToDelete.map(id => {
           console.log("deleting ", id);
           return deleteFromUnsubmittedReviews(id);
+        })
+      );
+    })
+    .catch(err => {
+      console.log("an error occured in a fetch");
+      return Promise.reject("something went wrong", err);
+    });
+};
+
+syncOfflineFavourites = async () => {
+  const unsyncedFavouriteStatus = await getAllUnsyncedFavourites();
+  const favouritesSynced = [];
+
+  console.log("our unsynced favourites are ", unsyncedFavouriteStatus);
+
+  return Promise.all(
+    unsyncedFavouriteStatus.map(favourite => {
+      const currId = favourite.restaurant_id;
+      return fetch(
+        `${restaurantApiUrl}/${currId}/?is_favorite=${
+          favourite.favouriteStatus
+        }`,
+        {
+          method: "PUT"
+        }
+      )
+        .then(o => {
+          console.log("sucessfully synced favourite ", o);
+          favouritesSynced.push(currId);
+        })
+        .catch(err => {
+          console.log("fetch failed");
+          return Promise.reject(err);
+        });
+    })
+  )
+    .then(() => {
+      return Promise.all(
+        favouritesSynced.map(id => {
+          console.log("deleting ", id);
+          return deleteFromUnsyncedFavourites(id);
         })
       );
     })
@@ -132,10 +184,26 @@ getAllUnsubmittedReviews = async () => {
   });
 };
 
+getAllUnsyncedFavourites = async () => {
+  return getStore().then(db => {
+    const tx = db.transaction(unsubmittedFavouriteStatus, "readonly");
+    return tx.objectStore(unsubmittedFavouriteStatus).getAll();
+  });
+};
+
+deleteFromUnsyncedFavourites = async id => {
+  return getStore().then(db => {
+    const tx = db.transaction(unsubmittedFavouriteStatus, "readwrite");
+    return tx.objectStore(unsubmittedFavouriteStatus).delete(id);
+    return tx.complete;
+  });
+};
+
 deleteFromUnsubmittedReviews = async id => {
   return getStore().then(db => {
     const tx = db.transaction(unsubmittedReviewStore, "readwrite");
-    return tx.objectStore(unsubmittedReviewStore).delete(id);
+    tx.objectStore(unsubmittedReviewStore).delete(id);
+    return tx.complete;
   });
 };
 
@@ -183,6 +251,7 @@ checkCacheAndRespond = (cache, request) => {
 };
 
 getStore = () => {
+  console.log("Getting store");
   return idb.open(storeName, storeVersion);
 };
 
@@ -206,56 +275,100 @@ self.addEventListener("fetch", event => {
   const url = new URL(urlString);
 
   if (urlString.startsWith(restaurantApiUrl)) {
-    event.respondWith(
-      fetch(event.request)
-        .then(resp => {
-          const originalResp = resp.clone();
-          resp.json().then(rests => {
-            getStore().then(db => {
-              const tx = db.transaction(restaurantStore, "readwrite");
-              if (Array.isArray(rests)) {
-                rests.map(rest => {
-                  tx.objectStore(restaurantStore).put(rest);
+    if (
+      event.request.method === "PUT" &&
+      urlString.indexOf("is_favorite") > 0
+    ) {
+      const urlDataPart = urlString.replace(restaurantApiUrl + "/", "");
+
+      const restId = Number(
+        urlDataPart.substring(0, urlDataPart.lastIndexOf("/"))
+      );
+      const favouriteStatus =
+        urlDataPart.substring(
+          urlDataPart.lastIndexOf("=") + 1,
+          urlDataPart.length
+        ) === "true";
+      event.respondWith(
+        fetch(event.request)
+          .then(resp => {
+            return getRestaurantFromCache(restId).then(restaurant => {
+              restaurant.is_favorite = favouriteStatus;
+              return updateRestaurantInCache(restaurant).then(() => {
+                return resp;
+              });
+            });
+          })
+          .catch(err => {
+            console.log(err);
+            return getRestaurantFromCache(restId).then(restaurant => {
+              restaurant.is_favorite = favouriteStatus;
+              return updateRestaurantInCache(restaurant).then(() => {
+                return getRestaurantFromCache(restId).then(restaurant => {
+                  const responseJson = generateResponseFromJson(restaurant);
+                  return flagFavouriteAsOffline(restId, favouriteStatus).then(
+                    () => {
+                      return responseJson;
+                    }
+                  );
                 });
+              });
+            });
+          })
+      );
+    } else {
+      event.respondWith(
+        fetch(event.request)
+          .then(resp => {
+            const originalResp = resp.clone();
+            resp.json().then(rests => {
+              getStore().then(db => {
+                const tx = db.transaction(restaurantStore, "readwrite");
+                if (Array.isArray(rests)) {
+                  rests.map(rest => {
+                    tx.objectStore(restaurantStore).put(rest);
+                  });
+                } else {
+                  tx.objectStore(restaurantStore).put(rests);
+                }
+                return tx.complete;
+              });
+            });
+            return originalResp;
+          })
+          .catch(() => {
+            const isSingleRestaurant = Number.isInteger(
+              Number(urlString.substring(urlString.length - 1))
+            );
+
+            return getStore().then(db => {
+              const tx = db.transaction(restaurantStore, "readonly");
+              if (isSingleRestaurant) {
+                const restId = Number(
+                  urlString.substring(
+                    urlString.lastIndexOf("/") + 1,
+                    urlString.length
+                  )
+                );
+
+                return tx
+                  .objectStore(restaurantStore)
+                  .get(restId)
+                  .then(rest => {
+                    return generateResponseFromJson(rest);
+                  });
               } else {
-                tx.objectStore(restaurantStore).put(rests);
+                return tx
+                  .objectStore(restaurantStore)
+                  .getAll()
+                  .then(restaurants => {
+                    return generateResponseFromJson(restaurants);
+                  });
               }
             });
-          });
-          return originalResp;
-        })
-        .catch(() => {
-          const isSingleRestaurant = Number.isInteger(
-            Number(urlString.substring(urlString.length - 1))
-          );
-
-          return getStore().then(db => {
-            const tx = db.transaction(restaurantStore, "readonly");
-            if (isSingleRestaurant) {
-              const restId = Number(
-                urlString.substring(
-                  urlString.lastIndexOf("/") + 1,
-                  urlString.length
-                )
-              );
-
-              return tx
-                .objectStore(restaurantStore)
-                .get(restId)
-                .then(rest => {
-                  return generateResponseFromJson(rest);
-                });
-            } else {
-              return tx
-                .objectStore(restaurantStore)
-                .getAll()
-                .then(restaurants => {
-                  return generateResponseFromJson(restaurants);
-                });
-            }
-          });
-        })
-    );
+          })
+      );
+    }
   }
 
   if (urlString.startsWith(reviewsApiUrl)) {
@@ -268,6 +381,7 @@ self.addEventListener("fetch", event => {
               getStore().then(db => {
                 const tx = db.transaction(reviewStore, "readwrite");
                 tx.objectStore(reviewStore).put(review);
+                return tx.complete;
               });
             });
             return originalResp;
@@ -280,7 +394,9 @@ self.addEventListener("fetch", event => {
                 o.updatedAt = createdDate;
                 const tx = db.transaction(unsubmittedReviewStore, "readwrite");
                 tx.objectStore(unsubmittedReviewStore).put(o);
-                return generateResponseFromJson(o);
+                return tx.complete.then(() => {
+                  return generateResponseFromJson(o);
+                });
               });
             });
           })
@@ -305,6 +421,7 @@ self.addEventListener("fetch", event => {
                 } else {
                   tx.objectStore(reviewStore).put(reviews);
                 }
+                return tx.complete;
               });
             });
             return originalResp;
@@ -364,5 +481,31 @@ getUnsubmittedReviewsByRestaurants = async restId => {
       .then(reviews => {
         return reviews;
       });
+  });
+};
+
+getRestaurantFromCache = async restId => {
+  return getStore().then(db => {
+    const tx = db.transaction(restaurantStore, "readonly");
+    return tx.objectStore(restaurantStore).get(restId);
+  });
+};
+
+updateRestaurantInCache = async restaurant => {
+  return getStore().then(db => {
+    const tx = db.transaction(restaurantStore, "readwrite");
+    tx.objectStore(restaurantStore).put(restaurant);
+    return tx.complete;
+  });
+};
+
+flagFavouriteAsOffline = async (restId, favouriteStatus) => {
+  return getStore().then(db => {
+    const tx = db.transaction(unsubmittedFavouriteStatus, "readwrite");
+    tx.objectStore(unsubmittedFavouriteStatus).put({
+      restaurant_id: restId,
+      favouriteStatus: favouriteStatus
+    });
+    return tx.complete;
   });
 };
