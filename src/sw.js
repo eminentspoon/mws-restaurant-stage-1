@@ -117,11 +117,9 @@ syncOfflineReviews = async () => {
         body: JSON.stringify(Object.assign(review, { id: undefined }))
       })
         .then(o => {
-          console.log("sucessfully added ", o);
           reviewsToDelete.push(currId);
         })
         .catch(err => {
-          console.log("fetch failed");
           return Promise.reject(err);
         });
     })
@@ -129,22 +127,21 @@ syncOfflineReviews = async () => {
     .then(() => {
       return Promise.all(
         reviewsToDelete.map(id => {
-          console.log("deleting ", id);
           return deleteFromUnsubmittedReviews(id);
         })
       );
     })
     .catch(err => {
-      console.log("an error occured in a fetch");
-      return Promise.reject("something went wrong", err);
+      return Promise.reject(
+        "An error occurred whilst processing offline reviews",
+        err
+      );
     });
 };
 
 syncOfflineFavourites = async () => {
   const unsyncedFavouriteStatus = await getAllUnsyncedFavourites();
   const favouritesSynced = [];
-
-  console.log("our unsynced favourites are ", unsyncedFavouriteStatus);
 
   return Promise.all(
     unsyncedFavouriteStatus.map(favourite => {
@@ -158,11 +155,9 @@ syncOfflineFavourites = async () => {
         }
       )
         .then(o => {
-          console.log("sucessfully synced favourite ", o);
           favouritesSynced.push(currId);
         })
         .catch(err => {
-          console.log("fetch failed");
           return Promise.reject(err);
         });
     })
@@ -170,14 +165,15 @@ syncOfflineFavourites = async () => {
     .then(() => {
       return Promise.all(
         favouritesSynced.map(id => {
-          console.log("deleting ", id);
           return deleteFromUnsyncedFavourites(id);
         })
       );
     })
     .catch(err => {
-      console.log("an error occured in a fetch");
-      return Promise.reject("something went wrong", err);
+      return Promise.reject(
+        "An error occurred whilst processing offline favourite restaurants",
+        err
+      );
     });
 };
 
