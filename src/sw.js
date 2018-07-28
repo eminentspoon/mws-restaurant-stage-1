@@ -107,8 +107,6 @@ syncOfflineReviews = async () => {
   const unsubmittedReviews = await getAllUnsubmittedReviews();
   const reviewsToDelete = [];
 
-  console.log("our unsubmitted reviews are ", unsubmittedReviews);
-
   return Promise.all(
     unsubmittedReviews.map(review => {
       const currId = review.id;
@@ -252,7 +250,6 @@ checkCacheAndRespond = (cache, request) => {
 };
 
 getStore = () => {
-  console.log("Getting store");
   return idb.open(storeName, storeVersion);
 };
 
@@ -301,7 +298,6 @@ self.addEventListener("fetch", event => {
             });
           })
           .catch(err => {
-            console.log(err);
             return getRestaurantFromCache(restId).then(restaurant => {
               restaurant.is_favorite = favouriteStatus;
               return updateRestaurantInCache(restaurant).then(() => {
