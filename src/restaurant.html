@@ -9,8 +9,6 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <link rel="stylesheet" href="css/styles.core.min.css">
-  <link rel="stylesheet" href="css/styles.medium.min.css" media="screen and (min-width:550px) and (max-width:899px)" />
-  <link rel="stylesheet" href="css/styles.large.min.css" media="screen and (min-width:900px)" />
   <title>Restaurant Info</title>
 </head>
 
@@ -82,7 +80,6 @@
           </th>
         </thead>
         <tbody>
-
         </tbody>
       </table>
     </section>
@@ -100,10 +97,25 @@
       <strong>Restaurant Reviews</strong>
     </a> All Rights Reserved.
   </footer>
-  <script type="application/javascript" charset="utf-8" src="js/swhelper.min.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/dbhelper.min.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/notifications.min.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/restaurant_info.min.js"></script>
+  <script src="js/swhelper.min.js"></script>
+  <script src="js/dbhelper.min.js"></script>
+  <script src="js/notifications.min.js"></script>
+  <script src="js/restaurant_info.min.js"></script>
+  <script>
+    let firstLink = document.querySelector("head");
+
+    let mediumCss = document.createElement('link');
+    mediumCss.rel = 'stylesheet';
+    mediumCss.href = 'css/styles.medium.min.css';
+    mediumCss.media = 'screen and (min-width:550px) and (max-width:899px)';
+    firstLink.appendChild(mediumCss);
+
+    let largeCss = document.createElement('link');
+    largeCss.href = 'css/styles.large.min.css';
+    largeCss.rel = 'stylesheet';
+    largeCss.media = "screen and (min-width:900px)";
+    firstLink.appendChild(largeCss);
+  </script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFB1pR-UuGV75XdNpHn58LCLBo7r2Ek0A&libraries=places&callback=initMap"></script>
 </body>
 
