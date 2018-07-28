@@ -208,7 +208,7 @@ createRestaurantHTML = (restaurant, totalCount, pos) => {
   li.setAttribute("aria-label", restaurant.name);
 
   li.append(createRestaurantImageHTML(restaurant));
-  if (restaurant.is_favorite === "true") {
+  if (restaurant.is_favorite && restaurant.is_favorite.toString() === "true") {
     const favouriteContainer = document.createElement("div");
     favouriteContainer.classList.add("favourite-container");
     favouriteContainer.setAttribute("aria-hidden", true);
