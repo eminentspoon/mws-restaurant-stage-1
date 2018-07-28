@@ -72,17 +72,17 @@ The latest lighthouse audit figures are as follows:
 
 #### Accessibility
 
-The full report for accessibilty targets can be found [here](https://github.com/eminentspoon/mws-restaurant-stage-1/blob/audits/accessibility.md), this also includes screenshots of the achieved targets.
+The full report for accessibilty targets can be found [here](https://github.com/eminentspoon/mws-restaurant-stage-1/blob/master/audits/accessibility.md), this also includes screenshots of the achieved targets.
 
 #### Progressive Web Application
 
-The full report for progressive web application targets can be found [here](https://github.com/eminentspoon/mws-restaurant-stage-1/blob/audits/pwa.md), this also includes screenshots of the achieved targets.
+The full report for progressive web application targets can be found [here](https://github.com/eminentspoon/mws-restaurant-stage-1/blob/master/audits/pwa.md), this also includes screenshots of the achieved targets.
 
 #### Performance
 
 In order to properly test for the performance targets, the results were measured by hosting the application within an apache web server which had gzip compression enabled.
 
-The full report for the performance targets can be found [here](https://github.com/eminentspoon/mws-restaurant-stage-1/blob/audits/perf.md), this also includes screenshots of the targets under different scenarios.
+The full report for the performance targets can be found [here](https://github.com/eminentspoon/mws-restaurant-stage-1/blob/master/audits/perf.md), this also includes screenshots of the targets under different scenarios.
 
 ### Releases
 
