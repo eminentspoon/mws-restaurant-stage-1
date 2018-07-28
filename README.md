@@ -12,8 +12,8 @@ For the **Restaurant Reviews** projects, you will incrementally convert a static
 
 - Users are able to mark restaurants as favourites and persist this status to the server - ✓
 - The restaurant favourite status is visible in the application - ✓
-- A form is added to allow users to add their own reviews for restaurants - ✓
-- Review form submission works proper and persists the review to the server - ✓
+- A form is needed to allow users to add their own reviews for restaurants - ✓
+- Review form submission works properly and persists the review to the server - ✓
 
 #### Offline Use
 
@@ -21,7 +21,7 @@ For the **Restaurant Reviews** projects, you will incrementally convert a static
 - JSON responses are cached to the IndexedDB store - ✓
 - Any data previously accessed whilst connected is reachable when offline - ✓
 - User is able to add a review to a restaurant whilst offline - ✓
-- Any reviews submitted whilst offline is sent to the server when connectivity is re-established - ✓
+- Any reviews submitted whilst offline are sent to the server when connectivity is re-established - ✓
 
 #### Responsive Design and Accessibility
 
@@ -62,7 +62,7 @@ The latest lighthouse audit figures are as follows:
 - All API calls converted to promises, removing existing callback functionality
 - If a restaurant image on the site is requested but not in the cache, the default image is displayed rather than a missing image
 - Offline sync functionality added to the system to handle offline reviews and offline favourite status changes  
-  **Note**: I heavily trialled the background sync functionality to provide this functionality. During testing, I found that the timings that the script ran to sync was unreliable and under some instances, when navigating, the script seemed to hang and never run despite showing as still registered. In the end, adding a listener to the online status proved to be a lot more reliable.
+  **Note**: I heavily trialled service worker background sync to provide this functionality. During testing, I found the timings that the sync script ran were unreliable and under some instances, when navigating, the script seemed to hang and never run despite showing as still registered. In the end, adding a listener to the online status proved to be a lot more reliable.
 - Fix added to the system to handle the inconsistant typing of 'is_favorite' from the server (is a boolean on first load, after any change, it is then a string)
 - Scripts generally tidied up and comments added to appropriate areas in the service worker
 - Better error handling and reporting added to the system
