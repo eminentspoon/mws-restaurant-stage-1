@@ -14,10 +14,12 @@ const desktopMedia = "(min-width: 900px)";
 const mediumMedia = "(min-width: 550px) and (max-width: 899px)";
 const baseMedia = "(max-width: 549px)";
 const markerTimerGap = 500;
+let notificationManager;
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener("DOMContentLoaded", event => {
+  notificationManager = new NotificationManager();
   SWHelper.registerServiceWorker();
   fetchNeighborhoods();
   fetchCuisines();
@@ -34,16 +36,15 @@ document.addEventListener("DOMContentLoaded", event => {
 /**
  * Fetch all neighborhoods and set their HTML.
  */
-fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
-    if (error) {
-      // Got an error
-      console.error(error);
-    } else {
+fetchNeighborhoods = async () => {
+  return DBHelper.fetchNeighborhoods()
+    .then(neighborhoods => {
       self.neighborhoods = neighborhoods;
       fillNeighborhoodsHTML();
-    }
-  });
+    })
+    .catch(err => {
+      notificationManager.showError(err, true);
+    });
 };
 
 bindLazyLoad = () => {
@@ -87,16 +88,15 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
 /**
  * Fetch all cuisines and set their HTML.
  */
-fetchCuisines = () => {
-  DBHelper.fetchCuisines((error, cuisines) => {
-    if (error) {
-      // Got an error!
-      console.error(error);
-    } else {
+fetchCuisines = async () => {
+  return DBHelper.fetchCuisines()
+    .then(cuisines => {
       self.cuisines = cuisines;
       fillCuisinesHTML();
-    }
-  });
+    })
+    .catch(err => {
+      notificationManager.showError(err, true);
+    });
 };
 
 /**
@@ -137,7 +137,7 @@ window.initMap = () => {
 /**
  * Update page and map for current restaurants.
  */
-updateRestaurants = () => {
+updateRestaurants = async () => {
   const cSelect = document.getElementById("cuisines-select");
   const nSelect = document.getElementById("neighborhoods-select");
 
@@ -147,20 +147,15 @@ updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(
-    cuisine,
-    neighborhood,
-    (error, restaurants) => {
-      if (error) {
-        // Got an error!
-        console.error(error);
-      } else {
-        resetRestaurants(restaurants);
-        fillRestaurantsHTML();
-        bindLazyLoad();
-      }
-    }
-  );
+  return DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
+    .then(restaurants => {
+      resetRestaurants(restaurants);
+      fillRestaurantsHTML();
+      bindLazyLoad();
+    })
+    .catch(err => {
+      notificationManager.showError(err, true);
+    });
 };
 
 /**
@@ -213,6 +208,24 @@ createRestaurantHTML = (restaurant, totalCount, pos) => {
   li.setAttribute("aria-label", restaurant.name);
 
   li.append(createRestaurantImageHTML(restaurant));
+  if (restaurant.is_favorite && restaurant.is_favorite.toString() === "true") {
+    const favouriteContainer = document.createElement("div");
+    favouriteContainer.classList.add("favourite-container");
+    favouriteContainer.setAttribute("aria-hidden", true);
+
+    const overlay = document.createElement("div");
+    overlay.classList.add("overlay");
+    favouriteContainer.appendChild(overlay);
+
+    const favouriteIcon = document.createElement("span");
+    favouriteIcon.classList.add("favourite");
+    favouriteIcon.title = `${
+      restaurant.name
+    } is one of your favourite restaurants`;
+    favouriteIcon.innerText = "★";
+    favouriteContainer.append(favouriteIcon);
+    li.append(favouriteContainer);
+  }
 
   const name = document.createElement("h2");
   name.innerHTML = restaurant.name;

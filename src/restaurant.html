@@ -9,8 +9,6 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <link rel="stylesheet" href="css/styles.core.min.css">
-  <link rel="stylesheet" href="css/styles.medium.min.css" media="screen and (min-width:550px) and (max-width:899px)" />
-  <link rel="stylesheet" href="css/styles.large.min.css" media="screen and (min-width:900px)" />
   <title>Restaurant Info</title>
 </head>
 
@@ -31,6 +29,31 @@
   </header>
   <main id="maincontent">
     <button id="skipmap">Skip past map</button>
+    <dialog id="review-dialog" role="dialog" aria-labelledby="dialog-title">
+      <h3 id="dialog-title">Add new restaurant review</h3>
+      <div class="form-field">
+        <label for="name">Your Name</label>
+        <input type="text" name="name" id="review-name" aria-label="Please enter your name" />
+      </div>
+      <div class="form-field">
+        <label for="rating">Restaurant Rating</label>
+        <div id="review-rating" class="rating" name="rating" aria-label="Restaurant not yet rated">
+          <button class="rating-button" data-rating="1" aria-label="Mark restaurant as 1 star out of 5"></button>
+          <button class="rating-button" data-rating="2" aria-label="Mark restaurant as 2 stars out of 5"></button>
+          <button class="rating-button" data-rating="3" aria-label="Mark restaurant as 3 stars out of 5"></button>
+          <button class="rating-button" data-rating="4" aria-label="Mark restaurant as 4 stars out of 5"></button>
+          <button class="rating-button" data-rating="5" aria-label="Mark restaurant as 5 stars out of 5"></button>
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="comments">Comments</label>
+        <textarea id="review-comments" name="comments" aria-label="Please enter your review comments"></textarea>
+      </div>
+      <div class="form-actions">
+        <button id="dialog-add" aria-label="Add review to restaurant">Add review</button>
+        <button id="dialog-cancel" aria-label="Cancel adding a review">Cancel</button>
+      </div>
+    </dialog>
     <section id="map-container">
       <div id="map" role="application" aria-label="Interactive map showing the location of this restaurant"></div>
     </section>
@@ -38,7 +61,12 @@
       <h2 id="restaurant-name"></h2>
       <p id="restaurant-address"></p>
       <div id="img-container">
-        <picture id="restaurant-img">
+        <div id="rest-favourite">
+          <div class="overlay">
+          </div>
+          <button id="favourite-set" tabindex="0">★</button>
+        </div>
+        <picture id="restaurant-img" />
       </div>
       <p id="restaurant-cuisine"></p>
       <table id="restaurant-hours" aria-label="Restaurant Opening Hours" role="grid">
@@ -52,7 +80,6 @@
           </th>
         </thead>
         <tbody>
-
         </tbody>
       </table>
     </section>
@@ -60,17 +87,35 @@
       <h3>Reviews</h3>
       <div id="reviewsdesc" hidden aria-hidden="Reviews for restaurant">Reviews for restaurant</div>
       <ul id="reviews-list" aria-describedby="reviewsdesc"></ul>
+      <button id="review-add">Add new review</button>
     </section>
+    <div id="notification-area" aria-live="polite" aria-relevant="all"></div>
   </main>
   <footer id="footer">
-    Copyright (c) 2017
+    Copyright (c) 2018
     <a href="/">
       <strong>Restaurant Reviews</strong>
     </a> All Rights Reserved.
   </footer>
-  <script type="application/javascript" charset="utf-8" src="js/swhelper.min.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/dbhelper.min.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/restaurant_info.min.js"></script>
+  <script src="js/swhelper.min.js"></script>
+  <script src="js/dbhelper.min.js"></script>
+  <script src="js/notifications.min.js"></script>
+  <script src="js/restaurant_info.min.js"></script>
+  <script>
+    let firstLink = document.querySelector("head");
+
+    let mediumCss = document.createElement('link');
+    mediumCss.rel = 'stylesheet';
+    mediumCss.href = 'css/styles.medium.min.css';
+    mediumCss.media = 'screen and (min-width:550px) and (max-width:899px)';
+    firstLink.appendChild(mediumCss);
+
+    let largeCss = document.createElement('link');
+    largeCss.href = 'css/styles.large.min.css';
+    largeCss.rel = 'stylesheet';
+    largeCss.media = "screen and (min-width:900px)";
+    firstLink.appendChild(largeCss);
+  </script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFB1pR-UuGV75XdNpHn58LCLBo7r2Ek0A&libraries=places&callback=initMap"></script>
 </body>
 

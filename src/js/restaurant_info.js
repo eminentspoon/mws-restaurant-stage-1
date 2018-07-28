@@ -6,6 +6,7 @@ let restaurantLoaded = false,
   dataFailed = false,
   mapInited = false;
 var map;
+let notificationManager;
 const desktopMedia = "(min-width: 900px)";
 const mediumMedia = "(min-width: 550px) and (max-width: 899px)";
 const baseMedia = "(max-width: 549px)";
@@ -48,31 +49,218 @@ window.initMap = () => {
 };
 
 document.addEventListener("DOMContentLoaded", event => {
-  fetchRestaurantFromURL();
+  notificationManager = new NotificationManager();
+  const restId = getRestaurantIdFromUrl();
+  if (!restId) {
+    // no id found in URL
+    console.error("No restaurant id in URL");
+    window.location = "/";
+  } else {
+    fetchRestaurantFromURL(restId).then(o => {
+      setupRestaurantFavourite(restId);
+      setupRestaurantReview(restId);
+    });
+  }
+
   SWHelper.registerServiceWorker();
   document.getElementById("skipmap").addEventListener("click", e => {
     document.getElementById("restaurant-container").focus();
   });
 });
 
+setupRestaurantReview = restId => {
+  const addReviewBtn = document.getElementById("review-add");
+  addReviewBtn.addEventListener("click", () => {
+    showReviewAdditionForm(restId);
+  });
+  const dialog = document.getElementById("review-dialog");
+  dialog.addEventListener("close", () => {
+    const commentsArea = document.getElementById("review-comments");
+    const ratingArea = document.querySelector("#review-rating");
+    const name = document.getElementById("review-name");
+    const elements = ratingArea.querySelectorAll("button.rating-button");
+    ratingArea.removeAttribute("data-selectedrating");
+    ratingArea.setAttribute("aria-label", `Restaurant not yet rated`);
+    name.value = "";
+    commentsArea.value = "";
+    elements.forEach(o => {
+      o.classList.remove("checked");
+    });
+  });
+
+  const dialogAdd = document.getElementById("dialog-add");
+  dialogAdd.addEventListener("click", addReview);
+
+  const dialogCancel = document.getElementById("dialog-cancel");
+  dialogCancel.addEventListener("click", closeReviewDialog);
+
+  const ratingElements = document.querySelectorAll("button.rating-button");
+  ratingElements.forEach(o => o.addEventListener("click", handleRatingClick));
+};
+
+function sanitiseText(str) {
+  var div = document.createElement("div");
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+handleRatingClick = e => {
+  let currEle = e.target;
+  let rating = Number(currEle.getAttribute("data-rating"));
+  const commentsArea = document.getElementById("review-comments");
+  const ratingArea = document.querySelector("#review-rating");
+  const elements = ratingArea.querySelectorAll("button.rating-button");
+  const elementCount = elements.length;
+  ratingArea.setAttribute("data-selectedrating", rating);
+  ratingArea.setAttribute("aria-label", `Rated ${rating} out of 5`);
+
+  for (let i = 0; i < elementCount; i++) {
+    let currentElement = elements[i];
+    if (i + 1 <= rating) {
+      if (!currentElement.classList.contains("checked")) {
+        currentElement.classList.add("checked");
+      }
+      continue;
+    }
+    currentElement.classList.remove("checked");
+  }
+  commentsArea.focus();
+};
+
+closeReviewDialog = () => {
+  const dialog = document.getElementById("review-dialog");
+  dialog.close();
+};
+
+addReview = async () => {
+  let errors = [];
+  let isErrored = false;
+  const name = sanitiseText(document.getElementById("review-name").value);
+  const dialog = document.getElementById("review-dialog");
+  const rating = document.getElementById("review-rating");
+  let selectedRating = sanitiseText(rating.getAttribute("data-selectedrating"));
+  const comments = sanitiseText(
+    document.getElementById("review-comments").value
+  );
+
+  if (name.length === 0) {
+    errors.push("Name must be provided");
+    isErrored = true;
+  }
+
+  if (
+    !selectedRating ||
+    isNaN(Number(selectedRating)) ||
+    Number(selectedRating) < 1 ||
+    Number(selectedRating) > 5
+  ) {
+    errors.push("Rating must be provided");
+    isErrored = true;
+  }
+
+  if (comments.length === 0) {
+    errors.push("Comments must be provided");
+    isErrored = true;
+  }
+
+  if (isErrored) {
+    let errorText = "Unable to create review:\r\n";
+
+    if (errors.length > 1) {
+      for (let i = 0; i < errors.length; i++) {
+        errorText += errors[i];
+        if (i < errors.length - 1) {
+          errorText += "\r\n";
+        }
+      }
+    } else {
+      errorText += errors[0];
+    }
+
+    notificationManager.showError(errorText, false);
+    return;
+  }
+
+  const createdReview = await DBHelper.createReview({
+    restaurant_id: Number(getRestaurantIdFromUrl()),
+    name: name,
+    rating: Number(selectedRating),
+    comments: comments
+  });
+  addSingleReviewToPage(createdReview);
+  notificationManager.showMessage(
+    "Your review has been added successfully",
+    false
+  );
+  dialog.close();
+};
+
+showReviewAdditionForm = restId => {
+  let dialog = document.getElementById("review-dialog");
+  dialog.setAttribute("data-restid", restId);
+  dialog.showModal();
+};
+
+getRestaurantIdFromUrl = () => {
+  return getParameterByName("id");
+};
+
+setupRestaurantFavourite = restId => {
+  const favouriteBlock = document.querySelector("#favourite-set");
+  favouriteBlock.addEventListener("click", e => {
+    e.preventDefault();
+    const restaurantId = restId;
+    const currentState = e.target.getAttribute("data-favourite");
+    const newStatus = !(Number(currentState) === 1);
+
+    DBHelper.changeRestaurantFavouriteStatus(restaurantId, newStatus).then(
+      o => {
+        notificationManager.showMessage(
+          "Restaurant favourite status updated on server",
+          false
+        );
+        self.restaurant.is_favorite = newStatus ? "true" : "false";
+        setFavouriteStatusOnPage();
+      }
+    );
+  });
+
+  setFavouriteStatusOnPage();
+};
+
+setFavouriteStatusOnPage = () => {
+  const favouriteBlock = document.querySelector("#favourite-set");
+  if (self.restaurant) {
+    if (
+      self.restaurant.is_favorite &&
+      self.restaurant.is_favorite.toString() === "true"
+    ) {
+      favouriteBlock.classList.add("checked");
+      favouriteBlock.setAttribute(
+        "aria-label",
+        "Remove restaurant as a favourite"
+      );
+      favouriteBlock.setAttribute("title", "Remove restaurant as a favourite");
+      favouriteBlock.setAttribute("data-favourite", "1");
+      return;
+    }
+    favouriteBlock.classList.remove("checked");
+    favouriteBlock.setAttribute("aria-label", "Mark restaurant as a favourite");
+    favouriteBlock.setAttribute("title", "Mark restaurant as a favourite");
+    favouriteBlock.setAttribute("data-favourite", "0");
+  }
+};
+
 /**
  * Get current restaurant from page URL.
  */
-fetchRestaurantFromURL = () => {
+fetchRestaurantFromURL = async restId => {
   if (self.restaurant) {
     return;
   }
-  const id = getParameterByName("id");
-  if (!id) {
-    // no id found in URL
-    console.error("No restaurant id in URL");
-  } else {
-    DBHelper.fetchRestaurantById(id, (error, restaurant) => {
+  return DBHelper.fetchRestaurantById(restId)
+    .then(restaurant => {
       self.restaurant = restaurant;
-      if (!restaurant) {
-        console.error(error);
-        return;
-      }
       restaurantLoaded = true;
       fillRestaurantHTML();
       fillBreadcrumb();
@@ -86,8 +274,12 @@ fetchRestaurantFromURL = () => {
           .getElementById("map-container")
           .setAttribute("aria-hidden", true);
       }, mapHideTimer);
+
+      return;
+    })
+    .catch(err => {
+      notificationManager.showError(err.text, true);
     });
-  }
 };
 
 /**
@@ -166,7 +358,8 @@ fillRestaurantHoursHTML = (
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = async () => {
+  const reviews = await DBHelper.getReviewsForRestaurant(self.restaurant.id);
   const container = document.getElementById("reviews-container");
 
   if (!reviews) {
@@ -180,7 +373,15 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   for (let i = 0; i < reviewCount; i++) {
     ul.appendChild(createReviewHTML(reviews[i], reviewCount, i + 1));
   }
-  container.appendChild(ul);
+};
+
+addSingleReviewToPage = review => {
+  const ul = document.getElementById("reviews-list");
+  let currEntries = ul.querySelectorAll("li");
+  const currEntryLength = currEntries.length + 1;
+
+  currEntries.forEach(o => o.setAttribute("aria-setsize", currEntryLength));
+  ul.appendChild(createReviewHTML(review, currEntryLength, currEntryLength));
 };
 
 /**
@@ -201,7 +402,7 @@ createReviewHTML = (review, totalCount, pos) => {
 
   const date = document.createElement("p");
   date.classList.add("date");
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.updatedAt).toDateString();
   li.appendChild(date);
 
   const rating = document.createElement("div");
