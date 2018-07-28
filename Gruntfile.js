@@ -92,6 +92,7 @@ module.exports = function(grunt) {
           "dist/js/dbhelper.min.js": ["src/js/dbhelper.js"],
           "dist/js/main.min.js": ["src/js/main.js"],
           "dist/js/restaurant_info.min.js": ["src/js/restaurant_info.js"],
+          "dist/js/notifications.min.js": ["src/js/notifications.js"],
           "dist/js/swhelper.min.js": ["src/js/swhelper.js"],
           "dist/js/idb.min.js": ["node_modules/idb/lib/idb.js"]
         }
