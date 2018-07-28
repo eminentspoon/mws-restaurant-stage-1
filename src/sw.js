@@ -87,13 +87,18 @@ initStore = () => {
 
 self.addEventListener("message", event => {
   if (event.data === "sync-offline") {
-    console.log("offline sync called");
     syncOfflineReviews().catch(err => {
-      console.error("There was a problem syncing offline content", err);
+      console.error(
+        "There was a problem syncing offline reviews to the server",
+        err
+      );
     });
 
     syncOfflineFavourites().catch(err => {
-      console.error("There was a problem syncing offline content", err);
+      console.error(
+        "There was a problem syncing favourite restaurants to the server",
+        err
+      );
     });
   }
 });
