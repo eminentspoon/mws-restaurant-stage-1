@@ -16,13 +16,13 @@ const baseCacheValues = [
   "/favicon.ico",
   defaultImage,
   "/img/static/placeholder.webp",
-  "/img/static/icon-96x96.webp",
-  "/img/static/icon-128x128.webp",
-  "/img/static/icon-144x144.webp",
-  "/img/static/icon-152x152.webp",
-  "/img/static/icon-192x192.webp",
-  "/img/static/icon-384x384.webp",
-  "/img/static/icon-512x512.webp"
+  "/img/static/icon-96x96.png",
+  "/img/static/icon-128x128.png",
+  "/img/static/icon-144x144.png",
+  "/img/static/icon-152x152.png",
+  "/img/static/icon-192x192.png",
+  "/img/static/icon-384x384.png",
+  "/img/static/icon-512x512.png"
 ];
 
 const version = "v0.3";
